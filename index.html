@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuestFlow - ADHD Focus Game</title>
+    <title>QuestFlow Pro - ADHD Hub</title>
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #151d30;
+            --bg-color: #0b111e;
+            --card-bg: #162238;
             --accent: #10b981;
             --xp-color: #3b82f6;
-            --missed-color: #f59e0b;
+            --dump-color: #a855f7;
             --text: #f3f4f6;
             --text-dim: #9ca3af;
         }
@@ -22,111 +22,164 @@
         .container { width: 100%; max-width: 440px; }
         .dashboard {
             background: var(--card-bg); padding: 15px; border-radius: 12px;
-            margin-bottom: 20px; border-bottom: 4px solid var(--xp-color);
+            margin-bottom: 15px; border-bottom: 4px solid var(--xp-color);
         }
         .stat-row { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
         .xp-bar-container { background: #1f293d; height: 10px; border-radius: 5px; overflow: hidden; }
         .xp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width 0.4s ease; }
-        .positivity-box {
-            background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent);
-            padding: 10px; border-radius: 8px; font-size: 0.9rem; text-align: center;
-            margin-bottom: 15px; color: #34d399; font-weight: 500;
+        
+        /* Brain Dump Box */
+        .dump-zone {
+            background: #111c30; border: 2px dashed var(--dump-color);
+            padding: 15px; border-radius: 12px; margin-bottom: 20px;
         }
-        .input-group { display: flex; gap: 8px; margin-bottom: 15px; }
-        input {
-            flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #1f293d;
-            background: #111827; color: #fff; font-size: 1rem;
+        textarea {
+            width: 100%; height: 80px; background: #070d18; border: 1px solid #1f293d;
+            border-radius: 8px; color: #fff; padding: 10px; box-sizing: border-box; font-family: inherit; resize: none;
         }
-        button {
-            padding: 12px 16px; border-radius: 8px; border: none;
-            background: var(--accent); color: #000; font-weight: bold; cursor: pointer;
+        
+        /* Category Folders */
+        .category-section { margin-top: 20px; }
+        .category-header {
+            font-size: 1rem; font-weight: bold; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
         }
         .task-card {
-            background: var(--card-bg); padding: 14px; border-radius: 10px;
-            margin-bottom: 10px; border-left: 4px solid var(--accent);
-            display: flex; justify-content: space-between; align-items: center;
+            background: var(--card-bg); padding: 12px; border-radius: 8px;
+            margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+            animation: slideIn 0.2s ease;
         }
-        .quest-title { font-weight: 600; }
-        .recovery-zone {
-            background: rgba(245, 158, 11, 0.08); border: 1px dashed var(--missed-color);
-            padding: 12px; border-radius: 10px; margin-top: 25px;
+        .tag { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; color: #fff; }
+        .tag-urgent { background: #ef4444; }
+        .tag-routine { background: #3b82f6; }
+        .tag-low { background: #6b7280; }
+
+        button {
+            padding: 10px 14px; border-radius: 6px; border: none;
+            background: var(--accent); color: #000; font-weight: bold; cursor: pointer;
         }
-        .recovery-title { color: var(--missed-color); font-weight: bold; font-size: 0.95rem; margin-bottom: 8px; }
-        .recovery-card {
-            background: #1c1b22; padding: 10px; border-radius: 6px; margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;
-        }
+        .btn-purple { background: var(--dump-color); color: #fff; width: 100%; margin-top: 8px; }
+        
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
 <body>
+
 <div class="container">
+    <!-- Player Stats -->
     <div class="dashboard">
         <div class="stat-row">
             <span>✨ Hero Level: <span id="levelDisplay">1</span></span>
-            <span style="color: var(--accent);">🔥 Streak: <span id="streakDisplay">1</span> days</span>
+            <span style="color: var(--accent);">⭐ XP: <span id="xpDisplay">0</span>/100</span>
         </div>
         <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
-        <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; text-align: right;" id="xpText">0 / 100 XP</div>
     </div>
-    <div class="positivity-box" id="motivateBox">🚀 Just opening this app means you're trying. Outstanding job!</div>
-    <h2 style="font-size: 1.2rem; margin: 0 0 10px 0;">Active Quests</h2>
-    <div class="input-group">
-        <input type="text" id="taskInput" placeholder="Set a micro-quest...">
-        <button onclick="addTask()">Deploy</button>
+
+    <!-- Brain Dump Space -->
+    <div class="dump-zone">
+        <h3 style="margin: 0 0 5px 0; color: var(--dump-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
+        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type everything stressing you out in one big messy sentence. Let the app sort it.</p>
+        <textarea id="brainDumpInput" placeholder="Example: clean my room today, call mom tomorrow, buy milk later, fix car ASAP..."></textarea>
+        <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
     </div>
-    <div id="taskList"></div>
-    <div class="recovery-zone" id="recoveryZone" style="display: none;">
-        <div class="recovery-title">⏳ The Time Capsule (Missed Quests)</div>
-        <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0 0 10px 0;">No stress! These slipped past, but you can rescue them for Double XP whenever you're ready.</p>
-        <div id="recoveryList"></div>
+
+    <!-- Automated Lists -->
+    <div class="category-section">
+        <div class="category-header" style="color: #ef4444;">🚨 Urgent Quests (Do Now)</div>
+        <div id="urgentList"></div>
+    </div>
+
+    <div class="category-section">
+        <div class="category-header" style="color: #3b82f6;">📅 Routine & Tasks</div>
+        <div id="routineList"></div>
+    </div>
+
+    <div class="category-section">
+        <div class="category-header" style="color: #6b7280;">⏳ Backburner (Someday)</div>
+        <div id="lowList"></div>
     </div>
 </div>
+
 <script>
-    let state = JSON.parse(localStorage.getItem('questflow_state')) || {
-        tasks: [], missedTasks: [], xp: 0, level: 1, streak: 1, lastOpen: new Date().toDateString()
-    };
-    const motivationalPhrases = [
-        "Progress isn't linear. Any step forward counts! ⭐",
-        "You're fighting executive dysfunction right now—and winning. 🧠",
-        "Even a 1-minute effort is infinitely better than 0 minutes!",
-        "Take a deep breath. You've got this quest handled."
-    ];
-    function saveState() { localStorage.setItem('questflow_state', JSON.stringify(state)); }
-    function checkDailyStreak() {
-        const today = new Date().toDateString();
-        if (state.lastOpen !== today) { state.xp += 20; state.lastOpen = today; saveState(); }
+    let state = JSON.parse(localStorage.getItem('questflow_v2')) || { tasks: [], xp: 0, level: 1 };
+
+    function save() { localStorage.setItem('questflow_v2', JSON.stringify(state)); }
+
+    // THE AUTOMATED SORTING ALGORITHM
+    function smashBrainDump() {
+        const text = document.getElementById('brainDumpInput').value;
+        if (!text.trim()) return;
+
+        // Split text by commas, periods, or the word "and" to isolate tasks
+        const rawItems = text.split(/,|\.| and /);
+        
+        rawItems.forEach(item => {
+            let taskText = item.trim();
+            if (!taskText || taskText.length < 3) return;
+
+            let priority = 'routine'; // Default lane
+
+            // Automated Priority Keyword Matching
+            const urgentKeywords = ['asap', 'urgent', 'today', 'now', 'important', 'fix'];
+            const lowKeywords = ['later', 'someday', 'maybe', 'next week', 'whenever'];
+
+            if (urgentKeywords.some(word => taskText.toLowerCase().includes(word))) {
+                priority = 'urgent';
+            } else if (lowKeywords.some(word => taskText.toLowerCase().includes(word))) {
+                priority = 'low';
+            }
+
+            state.tasks.push({
+                id: Date.now() + Math.random(),
+                text: taskText,
+                priority: priority
+            });
+        });
+
+        document.getElementById('brainDumpInput').value = '';
+        state.xp += 15; // Reward for clearing head
+        if (state.xp >= 100) { state.level++; state.xp -= 100; }
+        save();
+        render();
     }
-    function addXP(amount) {
-        state.xp += amount;
-        if (state.xp >= 100) { state.level += 1; state.xp -= 100; alert(`🎉 LEVEL UP! You reached Level ${state.level}!`); }
-        renderEngine();
-    }
-    function addTask() {
-        const input = document.getElementById('taskInput');
-        if (input.value.trim() !== '') {
-            state.tasks.push({ id: Date.now(), text: input.value.trim() });
-            input.value = ''; addXP(10); saveState(); renderEngine();
-        }
-    }
+
     function completeTask(id) {
         state.tasks = state.tasks.filter(t => t.id !== id);
-        addXP(25); saveState(); renderEngine();
+        state.xp += 20;
+        if (state.xp >= 100) { state.level++; state.xp -= 100; }
+        save();
+        render();
     }
-    function renderEngine() {
+
+    function render() {
         document.getElementById('levelDisplay').innerText = state.level;
-        document.getElementById('streakDisplay').innerText = state.streak;
+        document.getElementById('xpDisplay').innerText = state.xp;
         document.getElementById('xpBar').style.width = `${state.xp}%`;
-        document.getElementById('xpText').innerText = `${state.xp} / 100 XP`;
-        const taskList = document.getElementById('taskList');
-        taskList.innerHTML = '';
+
+        // Clear all folders
+        document.getElementById('urgentList').innerHTML = '';
+        document.getElementById('routineList').innerHTML = '';
+        document.getElementById('lowList').innerHTML = '';
+
         state.tasks.forEach(task => {
             const card = document.createElement('div');
             card.className = 'task-card';
-            card.innerHTML = `<span class="quest-title">${task.text}</span><button onclick="completeTask(${task.id})">Slay ⚔️</button>`;
-            taskList.appendChild(card);
+            card.innerHTML = `
+                <div>
+                    <span class="tag tag-${task.priority}">${task.priority.toUpperCase()}</span>
+                    <span style="margin-left: 8px;">${task.text}</span>
+                </div>
+                <button onclick="completeTask(${task.id})">⚔️</button>
+            `;
+
+            // Automatically place task card in correct HTML folder container
+            if (task.priority === 'urgent') document.getElementById('urgentList').appendChild(card);
+            if (task.priority === 'routine') document.getElementById('routineList').appendChild(card);
+            if (task.priority === 'low') document.getElementById('lowList').appendChild(card);
         });
     }
-    checkDailyStreak(); renderEngine();
+
+    render();
 </script>
 </body>
 </html>
