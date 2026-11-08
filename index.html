@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuestFlow - ADHD Focus Game</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #151d30;
+            --accent: #10b981;
+            --xp-color: #3b82f6;
+            --missed-color: #f59e0b;
+            --text: #f3f4f6;
+            --text-dim: #9ca3af;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color); color: var(--text); margin: 0; padding: 15px;
+            display: flex; justify-content: center;
+        }
+        .container { width: 100%; max-width: 440px; }
+        .dashboard {
+            background: var(--card-bg); padding: 15px; border-radius: 12px;
+            margin-bottom: 20px; border-bottom: 4px solid var(--xp-color);
+        }
+        .stat-row { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
+        .xp-bar-container { background: #1f293d; height: 10px; border-radius: 5px; overflow: hidden; }
+        .xp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width 0.4s ease; }
+        .positivity-box {
+            background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent);
+            padding: 10px; border-radius: 8px; font-size: 0.9rem; text-align: center;
+            margin-bottom: 15px; color: #34d399; font-weight: 500;
+        }
+        .input-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        input {
+            flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #1f293d;
+            background: #111827; color: #fff; font-size: 1rem;
+        }
+        button {
+            padding: 12px 16px; border-radius: 8px; border: none;
+            background: var(--accent); color: #000; font-weight: bold; cursor: pointer;
+        }
+        .task-card {
+            background: var(--card-bg); padding: 14px; border-radius: 10px;
+            margin-bottom: 10px; border-left: 4px solid var(--accent);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .quest-title { font-weight: 600; }
+        .recovery-zone {
+            background: rgba(245, 158, 11, 0.08); border: 1px dashed var(--missed-color);
+            padding: 12px; border-radius: 10px; margin-top: 25px;
+        }
+        .recovery-title { color: var(--missed-color); font-weight: bold; font-size: 0.95rem; margin-bottom: 8px; }
+        .recovery-card {
+            background: #1c1b22; padding: 10px; border-radius: 6px; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="dashboard">
+        <div class="stat-row">
+            <span>✨ Hero Level: <span id="levelDisplay">1</span></span>
+            <span style="color: var(--accent);">🔥 Streak: <span id="streakDisplay">1</span> days</span>
+        </div>
+        <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
+        <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; text-align: right;" id="xpText">0 / 100 XP</div>
+    </div>
+    <div class="positivity-box" id="motivateBox">🚀 Just opening this app means you're trying. Outstanding job!</div>
+    <h2 style="font-size: 1.2rem; margin: 0 0 10px 0;">Active Quests</h2>
+    <div class="input-group">
+        <input type="text" id="taskInput" placeholder="Set a micro-quest...">
+        <button onclick="addTask()">Deploy</button>
+    </div>
+    <div id="taskList"></div>
+    <div class="recovery-zone" id="recoveryZone" style="display: none;">
+        <div class="recovery-title">⏳ The Time Capsule (Missed Quests)</div>
+        <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0 0 10px 0;">No stress! These slipped past, but you can rescue them for Double XP whenever you're ready.</p>
+        <div id="recoveryList"></div>
+    </div>
+</div>
+<script>
+    let state = JSON.parse(localStorage.getItem('questflow_state')) || {
+        tasks: [], missedTasks: [], xp: 0, level: 1, streak: 1, lastOpen: new Date().toDateString()
+    };
+    const motivationalPhrases = [
+        "Progress isn't linear. Any step forward counts! ⭐",
+        "You're fighting executive dysfunction right now—and winning. 🧠",
+        "Even a 1-minute effort is infinitely better than 0 minutes!",
+        "Take a deep breath. You've got this quest handled."
+    ];
+    function saveState() { localStorage.setItem('questflow_state', JSON.stringify(state)); }
+    function checkDailyStreak() {
+        const today = new Date().toDateString();
+        if (state.lastOpen !== today) { state.xp += 20; state.lastOpen = today; saveState(); }
+    }
+    function addXP(amount) {
+        state.xp += amount;
+        if (state.xp >= 100) { state.level += 1; state.xp -= 100; alert(`🎉 LEVEL UP! You reached Level ${state.level}!`); }
+        renderEngine();
+    }
+    function addTask() {
+        const input = document.getElementById('taskInput');
+        if (input.value.trim() !== '') {
+            state.tasks.push({ id: Date.now(), text: input.value.trim() });
+            input.value = ''; addXP(10); saveState(); renderEngine();
+        }
+    }
+    function completeTask(id) {
+        state.tasks = state.tasks.filter(t => t.id !== id);
+        addXP(25); saveState(); renderEngine();
+    }
+    function renderEngine() {
+        document.getElementById('levelDisplay').innerText = state.level;
+        document.getElementById('streakDisplay').innerText = state.streak;
+        document.getElementById('xpBar').style.width = `${state.xp}%`;
+        document.getElementById('xpText').innerText = `${state.xp} / 100 XP`;
+        const taskList = document.getElementById('taskList');
+        taskList.innerHTML = '';
+        state.tasks.forEach(task => {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.innerHTML = `<span class="quest-title">${task.text}</span><button onclick="completeTask(${task.id})">Slay ⚔️</button>`;
+            taskList.appendChild(card);
+        });
+    }
+    checkDailyStreak(); renderEngine();
+</script>
+</body>
+</html>
