@@ -22,7 +22,6 @@
         }
         .container { width: 100%; max-width: 440px; }
         
-        /* Dashboard & daylight calculator */
         .dashboard {
             background: var(--card-bg); padding: 15px; border-radius: 12px;
             margin-bottom: 15px; border-bottom: 4px solid var(--xp-color);
@@ -32,7 +31,6 @@
         .xp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width 0.4s ease; }
         .daylight-str { font-size: 0.85rem; color: var(--text-dim); margin-top: 8px; text-align: center; }
 
-        /* Backpack Visual Weight Bar */
         .backpack-zone {
             background: #111c30; padding: 12px; border-radius: 10px;
             margin-bottom: 15px; display: flex; align-items: center; gap: 12px;
@@ -42,7 +40,6 @@
         .weight-bar-bg { background: #1f293d; height: 10px; border-radius: 5px; flex: 1; overflow: hidden; }
         .weight-bar { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); height: 100%; width: 0%; transition: width 0.4s; }
         
-        /* Chaos Text Entry Area */
         .dump-zone {
             background: #111c30; border: 2px dashed var(--xp-color);
             padding: 15px; border-radius: 12px; margin-bottom: 20px;
@@ -53,14 +50,12 @@
             font-family: inherit; font-size: 1rem; resize: none;
         }
         
-        /* Focus Timer Component */
         .timer-box {
             background: #162238; border: 1px solid #1f2d4d; padding: 12px; 
             border-radius: 12px; text-align: center; margin-bottom: 20px;
         }
         .timer-digits { font-size: 2.2rem; font-weight: bold; color: #34d399; font-variant-numeric: tabular-nums; }
 
-        /* Category Folder Lanes */
         .lane { background: rgba(19, 27, 46, 0.4); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #1f293d; }
         .lane-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; }
         
@@ -108,7 +103,7 @@
     <!-- Main Working Input Zone -->
     <div class="dump-zone">
         <h3 style="margin: 0 0 5px 0; color: var(--xp-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
-        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type your raw thoughts completely raw. Use commas, periods, or "and then" to separate tasks.</p>
+        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type your thoughts completely raw. Use commas, periods, or "and then" to separate tasks.</p>
         <textarea id="brainDumpInput" placeholder="Example: wash laundry today, fix car tire asap, call doctor later..."></textarea>
         <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
     </div>
@@ -149,12 +144,10 @@
         localStorage.setItem('questflow_v3_state', JSON.stringify(state)); 
     }
 
-    // High Reliability Run-On Sentence Processing Script
     function smashBrainDump() {
         const text = document.getElementById('brainDumpInput').value;
         if (!text.trim()) return;
 
-        // Splits text smoothly at commas, periods, or logical breath break connectors
         const rawItems = text.split(/,|\.|\band then\b|\bthen\b|\balso\b/i);
         
         rawItems.forEach(item => {
@@ -162,16 +155,14 @@
             if (!taskText || taskText.length < 3) return;
 
             let priority = 'routine'; 
-            let duration = 20; // Default minutes allocation marker
+            let duration = 20;
 
             const lower = taskText.toLowerCase();
 
-            // Auto-Time Allocation Sub-routines
             if (lower.includes('quick') || lower.includes('minute') || lower.includes('grab') || lower.includes('check')) duration = 5;
             if (lower.includes('clean') || lower.includes('cook') || lower.includes('shower') || lower.includes('wash')) duration = 30;
             if (lower.includes('study') || lower.includes('project') || lower.includes('drive') || lower.includes('fix')) duration = 60;
 
-            // Auto-Lane Classification Metrics
             if (lower.includes('asap') || lower.includes('urgent') || lower.includes('now') || lower.includes('today')) priority = 'urgent';
             if (lower.includes('later') || lower.includes('someday') || lower.includes('whenever')) priority = 'low';
 
@@ -190,17 +181,17 @@
         render();
     }
 
-    // Relocation Navigation Logic Engine
-    function moveTaskLane(id, targetPriority) {
+    function moveTaskLane(id, currentPriority) {
         const task = state.tasks.find(t => t.id === id);
         if (task) {
-            task.priority = targetPriority;
+            if (currentPriority === 'urgent') task.priority = 'routine';
+            else if (currentPriority === 'routine') task.priority = 'low';
+            else task.priority = 'urgent';
             saveState();
             render();
         }
     }
 
-    // Messaging Communication Delegation Frame
     function delegateTask(id) {
         const task = state.tasks.find(t => t.id === id);
         if (!task) return;
@@ -217,3 +208,14 @@
     }
 
     function toggleClockEngine() {
+        if (clockRunning) {
+            clearInterval(clockInterval);
+            clockRunning = false;
+        } else {
+            clockRunning = true;
+            clockInterval = setInterval(() => {
+                clockTimeRemaining--;
+                updateClockDisplay();
+                if (clockTimeRemaining <= 0) {
+                    clearInterval(clockInterval);
+                    clockRunning = false;
