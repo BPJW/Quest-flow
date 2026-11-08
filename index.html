@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuestFlow Pro</title>
+    <style>
+        :root {
+            --bg-color: #0b111e;
+            --card-bg: #162238;
+            --accent: #10b981;
+            --xp-color: #3b82f6;
+            --urgent-color: #ef4444;
+            --low-color: #6b7280;
+            --text: #f3f4f6;
+            --text-dim: #9ca3af;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color); color: var(--text); margin: 0; padding: 15px;
+            display: flex; justify-content: center;
+        }
+        .container { width: 100%; max-width: 440px; }
+        .dashboard { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-bottom: 4px solid var(--xp-color); }
+        .stat-row { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
+        .xp-bar-container { background: #1f293d; height: 10px; border-radius: 5px; overflow: hidden; }
+        .xp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width 0.4s; }
+        .daylight-str { font-size: 0.95rem; font-weight: bold; color: #fff; margin-top: 8px; text-align: center; background: rgba(59,130,246,0.15); padding: 6px; border-radius: 6px; }
+        .backpack-zone { background: #111c30; padding: 12px; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; gap: 12px; border-left: 4px solid var(--xp-color); }
+        .backpack-avatar { font-size: 2rem; }
+        .weight-bar-bg { background: #1f293d; height: 10px; border-radius: 5px; flex: 1; overflow: hidden; }
+        .weight-bar { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); height: 100%; width: 0%; transition: width 0.4s; }
+        .dump-zone { background: #111c30; border: 2px dashed var(--xp-color); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        textarea { width: 100%; height: 110px; background: #070d18; border: 1px solid #1f293d; border-radius: 8px; color: #fff; padding: 12px; box-sizing: border-box; font-family: inherit; font-size: 1rem; resize: none; }
+        .timer-box { background: #162238; border: 1px solid #1f2d4d; padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
+        .timer-digits { font-size: 2.2rem; font-weight: bold; color: #34d399; }
+        .lane { background: rgba(19, 27, 46, 0.4); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #1f293d; min-height: 60px;}
+        .lane-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; }
+        .task-card { background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); display: flex; flex-direction: column; gap: 8px; }
+        .task-main { display: flex; justify-content: space-between; align-items: center; }
+        .task-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid #1f2d4d; padding-top: 6px; }
+        button { padding: 10px 14px; border-radius: 6px; border: none; background: var(--accent); color: #000; font-weight: bold; cursor: pointer; }
+        .btn-purple { background: #a855f7; color: #fff; width: 100%; margin-top: 8px; font-size: 1rem; }
+        .action-link { color: #f59e0b; cursor: pointer; text-decoration: underline; }
+        .complete-btn { padding: 6px 12px; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="dashboard">
+        <div class="stat-row">
+            <span>✨ Hero Level: <span id="levelDisplay">1</span></span>
+            <span>⭐ XP: <span id="xpDisplay">0</span>/100</span>
+        </div>
+        <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
+        <div class="daylight-str" id="timeLeftStr">Calculating daylight...</div>
+    </div>
+    <div class="backpack-zone">
+        <div class="backpack-avatar" id="packIcon">🚶‍♂️</div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
+                <span>Backpack Weight</span>
+                <span id="weightLabel">Feather Light</span>
+            </div>
+            <div class="weight-bar-bg"><div class="weight-bar" id="loadBar"></div></div>
+        </div>
+    </div>
+    <div class="dump-zone">
+        <h3 style="margin: 0 0 5px 0; color: var(--xp-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
+        <textarea id="brainDumpInput" placeholder="Type tasks on separate lines..."></textarea>
+        <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
+    </div>
+    <div class="timer-box">
+        <div class="timer-digits" id="clockFace">25:00</div>
+        <p id="currentTimerTask" style="font-size:0.85rem; color:var(--text-dim); margin:4px 0 10px 0;">No active micro-quest selected</p>
+        <button onclick="toggleClockEngine()" style="background:#3b82f6; color:#fff; font-size:0.8rem; padding:6px 14px;">Play / Pause Session</button>
+    </div>
+    <div class="lane"><div class="lane-title" style="color: var(--urgent-color);">🚨 URGENT (Do Right Now)</div><div id="urgentList"></div></div>
+    <div class="lane"><div class="lane-title" style="color: #3b82f6;">📅 ROUTINE (Standard Pace)</div><div id="routineList"></div></div>
+    <div class="lane"><div class="lane-title" style="color: var(--low-color);">⏳ BACKBURNER (Someday / Low Energy)</div><div id="lowList"></div></div>
+</div>
+<script>
+    localStorage.clear();
+    let state = { tasks: [], xp: 0, level: 1 };
+    let clockInterval = null, clockTimeRemaining = 25 * 60, clockRunning = false, activeTimerTaskId = null;
+
+    function smashBrainDump() {
+        const text = document.getElementById('brainDumpInput').value;
+        if (!text.trim()) return;
+
+        const rawItems = text.split(/\n|,|\./);
+        rawItems.forEach(item => {
+            let taskText = item.trim();
+            if (!taskText || taskText.length < 2) return;
+
+            let priority = 'routine', duration = 20;
+            const lower = taskText.toLowerCase();
+
+            if (lower.includes('quick') || lower.includes('check') || lower.includes('fish')) duration = 15;
+            if (lower.includes('clean') || lower.includes('cook') || lower.includes('wash') || lower.includes('laundry')) duration = 30;
+            if (lower.includes('study') || lower.includes('project') || lower.includes('build') || lower.includes('engine')) duration = 60;
+
+            if (lower.includes('asap') || lower.includes('now') || lower.includes('today') || lower.includes('wash') || lower.includes('build')) priority = 'urgent';
+            if (lower.includes('later') || lower.includes('someday') || lower.includes('maybe') || lower.includes('fish')) priority = 'low';
+
+            state.tasks.push({ id: 't-' + Date.now() + Math.random().toString(36).substr(2,4), text: taskText.charAt(0).toUpperCase() + taskText.slice(1), priority: priority, duration: duration });
+        });
+        document.getElementById('brainDumpInput').value = '';
+        state.xp = Math.min(state.xp + 15, 100);
+        render();
+    }
+
+    function moveTaskLane(id) {
+        const task = state.tasks.find(t => t.id === id);
+        if (task) {
+            task.priority = task.priority === 'urgent' ? 'routine' : task.priority === 'routine' ? 'low' : 'urgent';
+            render();
+        }
+    }
+
+    function delegateTask(id) {
+        const task = state.tasks.find(t => t.id === id);
+        if (task) window.open(`sms:?&body=${encodeURIComponent('Can you help me with: ' + task.text)}`, '_blank');
+    }
+
+    function launchTimer(id, text, duration) {
+        activeTimerTaskId = id;
+        document.getElementById('currentTimerTask').innerText = `Focusing on: ${text}`;
+        clockTimeRemaining = duration * 60;
+        let m = Math.floor(clockTimeRemaining / 60), s = clockTimeRemaining % 60;
+        document.getElementById('clockFace').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+    }
+
+    function toggleClockEngine() {
+        if (clockRunning) { clearInterval(clockInterval); clockRunning = false; } 
+        else {
+            clockRunning = true;
+            clockInterval = setInterval(() => {
+                clockTimeRemaining--;
+                let m = Math.floor(clockTimeRemaining / 60), s = clockTimeRemaining % 60;
+                document.getElementById('clockFace').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+                if (clockTimeRemaining <= 0) { clearInterval(clockInterval); clockRunning = false; alert("Focus session complete!"); }
+            }, 1000);
+        }
+    }
+
+    function calculateDaylightAndWeight() {
+        const now = new Date(), capDay = new Date();
+        capDay.setHours(22, 0, 0, 0);
+        let diff = capDay - now;
+        document.getElementById('timeLeftStr').innerText = diff > 0 ? `⏳ ${Math.floor(diff/3600000)}h ${Math.floor((diff%3600000)/60000)}m remaining today.` : "🌙 Day complete! Rest up.";
+
+        const mins = state.tasks.reduce((acc, t) => acc + t.duration, 0);
+        const pct = Math.min((mins / 180) * 100, 100);
+        document.getElementById('loadBar').style.width = `${pct}%`;
+        document.getElementById('weightLabel').innerText = mins === 0 ? "Feather Light" : pct < 40 ? "Comfortable Load" : pct < 75 ? "Getting Heavy" : "CRITICAL OVERLOAD!";
+        document.getElementById('packIcon').innerText = mins === 0 ? "🚶‍♂️" : pct < 75 ? "🏋️‍♂️" : "🛑";
+    }
+
+    function render() {
+        document.getElementById('levelDisplay').innerText = state.level;
+        document.getElementById('xpDisplay').innerText = state.xp;
+        document.getElementById('xpBar').style.width = `${state.xp}%`;
