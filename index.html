@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuestFlow Master - ADHD Cognitive Hub</title>
+    <title>QuestFlow Pro - ADHD Hub</title>
     <style>
         :root {
-            --bg-color: #0a0e17;
-            --card-bg: #131b2e;
+            --bg-color: #0b111e;
+            --card-bg: #162238;
             --accent: #10b981;
             --xp-color: #3b82f6;
             --urgent-color: #ef4444;
@@ -19,173 +19,201 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color); color: var(--text); margin: 0; padding: 15px;
             display: flex; justify-content: center;
-            background-image: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent), radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.03), transparent);
         }
         .container { width: 100%; max-width: 440px; }
+        
+        /* Dashboard & daylight calculator */
         .dashboard {
-            background: var(--card-bg); padding: 15px; border-radius: 166px;
-            margin-bottom: 15px; border: 1px solid #1f2d4d; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            background: var(--card-bg); padding: 15px; border-radius: 12px;
+            margin-bottom: 15px; border-bottom: 4px solid var(--xp-color);
         }
-        .gauge-container { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.85rem; }
+        .stat-row { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
+        .xp-bar-container { background: #1f293d; height: 10px; border-radius: 5px; overflow: hidden; }
+        .xp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width 0.4s ease; }
+        .daylight-str { font-size: 0.85rem; color: var(--text-dim); margin-top: 8px; text-align: center; }
+
+        /* Backpack Visual Weight Bar */
         .backpack-zone {
-            background: #111827; padding: 12px; border-radius: 12px;
-            margin-bottom: 15px; display: flex; align-items: center; gap: 15px;
+            background: #111c30; padding: 12px; border-radius: 10px;
+            margin-bottom: 15px; display: flex; align-items: center; gap: 12px;
             border-left: 4px solid var(--xp-color);
         }
-        .backpack-avatar { font-size: 2.2rem; filter: drop-shadow(0 0 8px var(--xp-color)); transition: transform 0.3s; }
-        .weight-bar-bg { background: #1f293d; height: 12px; border-radius: 6px; width: 100%; overflow: hidden; margin-top: 4px; }
-        .weight-bar { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); height: 100%; width: 0%; transition: width 0.5s ease; }
-        .input-hub {
-            background: #111c30; border: 2px dashed #3b82f6; padding: 15px; border-radius: 14px; margin-bottom: 20px;
+        .backpack-avatar { font-size: 2rem; }
+        .weight-bar-bg { background: #1f293d; height: 10px; border-radius: 5px; flex: 1; overflow: hidden; }
+        .weight-bar { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); height: 100%; width: 0%; transition: width 0.4s; }
+        
+        /* Chaos Text Entry Area */
+        .dump-zone {
+            background: #111c30; border: 2px dashed var(--xp-color);
+            padding: 15px; border-radius: 12px; margin-bottom: 20px;
         }
-        .mic-btn {
-            background: #3b82f6; color: #fff; width: 100%; padding: 12px; font-weight: bold;
-            border-radius: 8px; border: none; cursor: pointer; margin-top: 8px; display: flex; justify-content: center; align-items: center; gap: 8px;
+        textarea {
+            width: 100%; height: 90px; background: #070d18; border: 1px solid #1f293d;
+            border-radius: 8px; color: #fff; padding: 12px; box-sizing: border-box; 
+            font-family: inherit; font-size: 1rem; resize: none;
         }
-        .mic-active { background: #ef4444; animation: pulse 1.5s infinite; }
+        
+        /* Focus Timer Component */
         .timer-box {
-            background: #182238; border: 1px solid #2d3d66; padding: 15px; border-radius: 12px;
-            text-align: center; margin-bottom: 20px;
+            background: #162238; border: 1px solid #1f2d4d; padding: 12px; 
+            border-radius: 12px; text-align: center; margin-bottom: 20px;
         }
-        .timer-digits { font-size: 2.5rem; font-weight: bold; color: #34d399; font-variant-numeric: tabular-nums; }
-        .lane { background: rgba(19, 27, 46, 0.5); padding: 12px; border-radius: 12px; margin-bottom: 15px; min-height: 60px; border: 1px solid #1f293d; }
-        .lane-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .timer-digits { font-size: 2.2rem; font-weight: bold; color: #34d399; font-variant-numeric: tabular-nums; }
+
+        /* Category Folder Lanes */
+        .lane { background: rgba(19, 27, 46, 0.4); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #1f293d; }
+        .lane-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; }
+        
         .task-card {
             background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 8px;
-            border-left: 4px solid var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            display: flex; flex-direction: column; gap: 6px; cursor: grab;
+            border-left: 4px solid var(--accent); display: flex; flex-direction: column; gap: 8px;
         }
         .task-main { display: flex; justify-content: space-between; align-items: center; }
-        .task-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-dim); border-top: 1px solid #1f2d4d; padding-top: 6px; }
-        .move-select { background: #1f293d; color: #fff; border: 1px solid #3b82f6; font-size: 0.75rem; padding: 2px; border-radius: 4px; outline: none; }
+        .task-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid #1f2d4d; padding-top: 6px; }
+
+        button {
+            padding: 10px 14px; border-radius: 6px; border: none;
+            background: var(--accent); color: #000; font-weight: bold; cursor: pointer;
+        }
+        .btn-purple { background: #a855f7; color: #fff; width: 100%; margin-top: 8px; font-size: 1rem; }
         .action-link { color: #f59e0b; cursor: pointer; text-decoration: underline; }
-        .complete-btn { background: var(--accent); color: #000; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: none; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .complete-btn { padding: 6px 12px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- Leveling Tracker Dashboard -->
     <div class="dashboard">
         <div class="stat-row">
-            <span>✨ Level <span id="lvl">1</span> Hero</span>
-            <span style="color: var(--accent);">🔋 Operational Day Tracker</span>
+            <span>✨ Hero Level: <span id="levelDisplay">1</span></span>
+            <span>⭐ XP: <span id="xpDisplay">0</span>/100</span>
         </div>
-        <div class="gauge-container">
-            <span id="timeLeftStr">Calculating remaining daylight...</span>
-        </div>
+        <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
+        <div class="daylight-str" id="timeLeftStr">Calculating daylight...</div>
     </div>
 
+    <!-- Visual Cognitive Overhead Weight Metaphor -->
     <div class="backpack-zone">
         <div class="backpack-avatar" id="packIcon">🚶‍♂️</div>
-        <div style="flex: 1;">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
             <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
                 <span>Backpack Weight (Task Burden)</span>
-                <span id="weightLabel">Empty</span>
+                <span id="weightLabel">Feather Light</span>
             </div>
             <div class="weight-bar-bg"><div class="weight-bar" id="loadBar"></div></div>
         </div>
     </div>
 
-    <div class="input-hub">
-        <h3 style="margin:0 0 4px 0; color:#3b82f6; font-size:1rem;">🎙️ Hands-Free Run-On Voice Smasher</h3>
-        <p style="margin:0 0 10px 0; font-size:0.75rem; color:var(--text-dim);">Tap mic and speak continuously. The app will automatically slice your run-on sentences into isolated tasks and estimate time.</p>
-        <textarea id="capturedTextTextarea" placeholder="Speak or type your raw thought loop here..."></textarea>
-        <button id="micButton" class="mic-btn" onclick="toggleVoiceCapture()">➔ Tap to Stream Voice Input</button>
+    <!-- Main Working Input Zone -->
+    <div class="dump-zone">
+        <h3 style="margin: 0 0 5px 0; color: var(--xp-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
+        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type your ran-on thoughts completely raw. Use commas, periods, or "and then" to separate tasks.</p>
+        <textarea id="brainDumpInput" placeholder="Example: wash laundry today, fix car tire asap, call doctor later..."></textarea>
+        <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
     </div>
 
+    <!-- Audio Visual Focus Clock Component -->
     <div class="timer-box">
         <div class="timer-digits" id="clockFace">25:00</div>
-        <p id="currentTimerTask" style="font-size:0.8rem; color:var(--text-dim); margin:4px 0 10px 0;">No active micro-quest selected</p>
+        <p id="currentTimerTask" style="font-size:0.85rem; color:var(--text-dim); margin:4px 0 10px 0;">No active micro-quest selected</p>
         <button onclick="toggleClockEngine()" style="background:#3b82f6; color:#fff; font-size:0.8rem; padding:6px 14px;">Play / Pause Session</button>
     </div>
 
-    <div class="lane" id="lane-urgent" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'urgent')">
-        <div class="lane-title" style="color:var(--urgent-color);"><span>🚨 URGENT (Do Right Now)</span></div>
-        <div id="box-urgent"></div>
+    <!-- Categorized Folders -->
+    <div class="lane">
+        <div class="lane-title" style="color: var(--urgent-color);">🚨 URGENT (Do Right Now)</div>
+        <div id="urgentList"></div>
     </div>
 
-    <div class="lane" id="lane-routine" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'routine')">
-        <div class="lane-title" style="color:#3b82f6;"><span>📅 ROUTINE (Standard Pace)</span></div>
-        <div id="box-routine"></div>
+    <div class="lane">
+        <div class="lane-title" style="color: #3b82f6;">📅 ROUTINE (Standard Pace)</div>
+        <div id="routineList"></div>
     </div>
 
-    <div class="lane" id="lane-low" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'low')">
-        <div class="lane-title" style="color:var(--low-color);"><span>⏳ BACKBURNER (Someday / Low Energy)</span></div>
-        <div id="box-low"></div>
+    <div class="lane">
+        <div class="lane-title" style="color: var(--low-color);">⏳ BACKBURNER (Someday / Low Energy)</div>
+        <div id="lowList"></div>
     </div>
 </div>
 
 <script>
-    // SECURE MOBILE REGISTER CORE
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(() => console.log("Secure Audio Framework Active"));
-    }
-
-    let coreState = JSON.parse(localStorage.getItem('questflow_master_state')) || {
-        backlog: [], xp: 0, level: 1
-    };
-
-    let audioCtx = null;
+    let state = JSON.parse(localStorage.getItem('questflow_v3_state')) || { tasks: [], xp: 0, level: 1 };
+    
     let clockInterval = null;
     let clockTimeRemaining = 25 * 60;
     let clockRunning = false;
     let activeTimerTaskId = null;
 
-    function playChimeEffect(type) {
-        try {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            if (type === 'success') {
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-            } else if (type === 'pop') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(330, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-            }
-        } catch(e) {}
+    function saveState() { 
+        localStorage.setItem('questflow_v3_state', JSON.stringify(state)); 
     }
 
-    let voiceRecognizer = null;
-    let recordingActive = false;
+    // High Reliability Run-On Sentence Processing Script
+     Lah smashBrainDump() {
+        const text = document.getElementById('brainDumpInput').value;
+        if (!text.trim()) return;
 
-    function toggleVoiceCapture() {
-        const btn = document.getElementById('micButton');
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            alert("Please test directly inside your Chrome or Safari browser tab rather than the Home Screen icon to allow microphone permission fields!");
-            return;
+        // Splits text smoothly at commas, periods, or logical breath break connectors
+        const rawItems = text.split(/,|\.|\band then\b|\bthen\b|\balso\b/i);
+        
+        rawItems.forEach(item => {
+            let taskText = item.trim();
+            if (!taskText || taskText.length < 3) return;
+
+            let priority = 'routine'; 
+            let duration = 20; // Default minutes allocation marker
+
+            const lower = taskText.toLowerCase();
+
+            // Auto-Time Allocation Sub-routines
+            if (lower.includes('quick') || lower.includes('minute') || lower.includes('grab') || lower.includes('check')) duration = 5;
+            if (lower.includes('clean') || lower.includes('cook') || lower.includes('shower') || lower.includes('wash')) duration = 30;
+            if (lower.includes('study') || lower.includes('project') || lower.includes('drive') || lower.includes('fix')) duration = 60;
+
+            // Auto-Lane Classification Metrics
+            if (lower.includes('asap') || lower.includes('urgent') || lower.includes('now') || lower.includes('today')) priority = 'urgent';
+            if (lower.includes('later') || lower.includes('someday') || lower.includes('whenever')) priority = 'low';
+
+            state.tasks.push({
+                id: 't-' + Date.now() + Math.random().toString(36).substr(2, 4),
+                text: taskText.charAt(0).toUpperCase() + taskText.slice(1),
+                priority: priority,
+                duration: duration
+            });
+        });
+
+        document.getElementById('brainDumpInput').value = '';
+        state.xp += 15;
+        if (state.xp >= 100) { state.level++; state.xp -= 100; }
+        saveState();
+        render();
+    }
+
+    // Relocation Navigation Logic Engine
+    function moveTaskLane(id, targetPriority) {
+        const task = state.tasks.find(t => t.id === id);
+        if (task) {
+            task.priority = targetPriority;
+            saveState();
+            render();
         }
+    }
 
-        if (!voiceRecognizer) {
-            const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
-            voiceRecognizer = new SpeechClass();
-            voiceRecognizer.continuous = true;
-            voiceRecognizer.interimResults = false;
+    // Messaging Communication Delegation Frame
+    function delegateTask(id) {
+        const task = state.tasks.find(t => t.id === id);
+        if (!task) return;
+        const smsMsg = encodeURIComponent(`Hey! I am running low on daylight slots today. Could you help me delegate this task: "${task.text}"? Thanks!`);
+        window.open(`sms:?&body=${smsMsg}`, '_blank');
+    }
 
-            voiceRecognizer.onresult = function(event) {
-                let speechResultString = "";
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) speechResultString += event.results[i].transcript;
-                }
-                document.getElementById('capturedTextTextarea').value += speechResultString + " ";
-                playChimeEffect('pop');
-            };
+    function launchTimer(id, text, duration) {
+        activeTimerTaskId = id;
+        document.getElementById('currentTimerTask').innerText = `Focusing on: ${text}`;
+        clockTimeRemaining = duration * 60;
+        updateClockDisplay();
+        if(!clockRunning) toggleClockEngine();
+    }
 
-            voiceRecognizer.onend = function() {
-                recordingActive = false;
-                btn.className = "mic-btn";
-                btn.innerText = "➔ Tap to Stream Voice Input";
-                processRawThoughtMatrix();
-            };
-        }
-        if (!recordingActive) {
-            voiceRecognizer.start();
-            recordingActive = true;
+    function toggleClockEngine() {
