@@ -68,7 +68,7 @@
     <div class="dump-zone">
         <h3 style="margin: 0 0 5px 0; color: var(--xp-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
         <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type tasks on separate lines. The system will prioritize them automatically.</p>
-        <textarea id="brainDumpInput" placeholder="Example:&#10;Wash laundry&#10;Build an engine&#10;Fish tomorrow"></textarea>
+        <textarea id="brainDumpInput" placeholder="Example:\nWash laundry\nBuild an engine\nFish tomorrow"></textarea>
         <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
     </div>
     <div class="timer-box">
@@ -80,6 +80,7 @@
     <div class="lane"><div class="lane-title" style="color: #3b82f6;">📅 ROUTINE (Standard Pace)</div><div id="routineList"></div></div>
     <div class="lane"><div class="lane-title" style="color: var(--low-color);">⏳ BACKBURNER (Someday / Low Energy)</div><div id="lowList"></div></div>
 </div>
+
 <script>
     let state = { tasks: [], xp: 0, level: 1 };
     try {
@@ -91,6 +92,16 @@
 
     function saveState() { 
         try { localStorage.setItem('questflow_v12_final', JSON.stringify(state)); } catch(e) {}
+    }
+
+    function updateDaylightClock() {
+        const now = new Date();
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+        const diffMs = endOfDay - now;
+        const hrs = Math.floor(diffMs / (1000 * 60 * 60));
+        const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        document.getElementById('timeLeftStr').innerText = `⏳ ${hrs}h ${mins}m of daylight remaining today`;
     }
 
     function smashBrainDump() {
@@ -107,113 +118,103 @@
             if (lower.includes('study') || lower.includes('project') || lower.includes('drive') || lower.includes('fix') || lower.includes('build') || lower.includes('engine')) duration = 60;
             if (lower.includes('asap') || lower.includes('now') || lower.includes('today') || lower.includes('deadline') || lower.includes('wash') || lower.includes('build')) priority = 'urgent';
             if (lower.includes('later') || lower.includes('someday') || lower.includes('whenever') || lower.includes('maybe') || lower.includes('fish')) priority = 'low';
-            state.tasks.push({ id: 't-' + Date.now() + Math.random().toString(36).substr(2, 4), text: taskText.charAt(0).toUpperCase() + taskText.slice(1), priority: priority, duration: duration });
+            
+            state.tasks.push({ 
+                id: 't-' + Date.now() + Math.random().toString(36).substr(2, 4), 
+                text: taskText.charAt(0).toUpperCase() + taskText.slice(1), 
+                priority: priority, 
+                duration: duration 
+            });
         });
         document.getElementById('brainDumpInput').value = '';
-        state.xp += 15;
-        if (state.xp >= 100) { state.level++; state.xp -= 100; }
-        saveState();
-        render();
+        gainXP(15);
+        renderAll();
     }
 
-    function moveTaskLane(id) {
-        if (!state.tasks) return;
-        const task = state.tasks.find(t => t.id === id);
-        if (task) {
-            if (task.priority === 'urgent') task.priority = 'routine';
-            else if (task.priority === 'routine') task.priority = 'low';
-            else task.priority = 'urgent';
-            saveState();
-            render();
+    function gainXP(amount) {
+        state.xp += amount;
+        while (state.xp >= 100) {
+            state.xp -= 100;
+            state.level++;
+            alert(`🎉 Level Up! You reached Hero Level ${state.level}!`);
         }
+        saveState();
     }
 
-    function delegateTask(id) {
-        if (!state.tasks) return;
-        const task = state.tasks.find(t => t.id === id);
-        if (task) window.open(`sms:?&body=${encodeURIComponent('Can you help me with: ' + task.text)}`, '_blank');
+    function completeTask(id, duration) {
+        state.tasks = state.tasks.filter(t => t.id !== id);
+        if (activeTimerTaskId === id) {
+            stopClock();
+            activeTimerTaskId = null;
+            document.getElementById('currentTimerTask').innerText = "No active micro-quest selected";
+        }
+        gainXP(duration);
+        renderAll();
     }
 
-    function launchTimer(id, text, duration) {
+    function startTimerTask(id, text, duration) {
         activeTimerTaskId = id;
-        document.getElementById('currentTimerTask').innerText = `Focusing on: ${text}`;
         clockTimeRemaining = duration * 60;
-        updateClockDisplay();
-        if(!clockRunning) toggleClockEngine();
+        document.getElementById('currentTimerTask').innerText = `🎯 Quest: ${text}`;
+        updateClockFace();
+        if (!clockRunning) {
+            toggleClockEngine();
+        }
     }
 
     function toggleClockEngine() {
-        if (clockRunning) { clearInterval(clockInterval); clockRunning = false; } 
-        else {
+        if (clockRunning) {
+            stopClock();
+        } else {
             clockRunning = true;
             clockInterval = setInterval(() => {
-                clockTimeRemaining--; updateClockDisplay();
-                if (clockTimeRemaining <= 0) {
-                    clearInterval(clockInterval); clockRunning = false;
-                    alert("Focus streak reached! +40 XP");
-                    if(activeTimerTaskId) completeTask(activeTimerTaskId);
-                }
-            }, 1000);
-        }
-    }
-
-    function updateClockDisplay() {
-        let m = Math.floor(clockTimeRemaining / 60), s = clockTimeRemaining % 60;
-        document.getElementById('clockFace').innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
-    }
-
-    function completeTask(id) {
-        if (!state.tasks) return;
-state.tasks = state.tasks.filter(t => t.id !== id);
-state.xp += 25;
-if (state.xp >= 100) { state.level++; state.xp -= 100; }
+                if (clockTimeRemaining > 0) {
+                    clockTimeRemaining--;
+                    updateClockFace();
+                } else {
+                    stopClock();
+alert("⏰ Micro-quest session finished! Claim your reward by completing the task.");
+}
+}, 1000);
+}
+}
+function stopClock() {
+clockRunning = false;
+clearInterval(clockInterval);
+}
+function updateClockFace() {
+const m = Math.floor(clockTimeRemaining / 60).toString().padStart(2, '0');
+const s = (clockTimeRemaining % 60).toString().padStart(2, '0');
+document.getElementById('clockFace').innerText = ${m}:${s};
+}
+function renderAll() {
 saveState();
-render();
-}
-function calculateDaylightAndWeight() {
-const now = new Date(), capDay = new Date();
-capDay.setHours(22, 0, 0, 0);
-let diff = capDay - now;
-const clockEl = document.getElementById('timeLeftStr');
-if (clockEl) {
-clockEl.innerText = diff > 0 ? ⏳ ${Math.floor(diff/3600000)}h ${Math.floor((diff%3600000)/60000)}m remaining today. : "🌙 Day complete! Rest up.";
-}
-if (!state.tasks) state.tasks = [];
-const mins = state.tasks.reduce((acc, t) => acc + t.duration, 0);
-const pct = Math.min((mins / 180) * 100, 100);
-const barEl = document.getElementById('loadBar');
-const labelEl = document.getElementById('weightLabel');
-const iconEl = document.getElementById('packIcon');
-if (barEl) barEl.style.width = ${pct}%;
-if (labelEl) labelEl.innerText = mins === 0 ? "Feather Light" : pct < 40 ? "Comfortable Load" : pct < 75 ? "Getting Heavy" : "CRITICAL OVERLOAD!";
-if (iconEl) iconEl.innerText = mins === 0 ? "🚶‍♂️" : pct < 75 ? "🏋️‍♂️" : "🛑";
-}
-function render() {
-const lvlEl = document.getElementById('levelDisplay');
-const xpEl = document.getElementById('xpDisplay');
-const barEl = document.getElementById('xpBar');
-if (lvlEl) lvlEl.innerText = state.level || 1;
-if (xpEl) xpEl.innerText = state.xp || 0;
-if (barEl) barEl.style.width = ${state.xp || 0}%;
-const uList = document.getElementById('urgentList');
-const rList = document.getElementById('routineList');
-const lList = document.getElementById('lowList');
-if (uList) uList.innerHTML = '';
-if (rList) rList.innerHTML = '';
-if (lList) lList.innerHTML = '';
-if (state.tasks && state.tasks.length > 0) {
+updateDaylightClock();
+document.getElementById('levelDisplay').innerText = state.level;
+document.getElementById('xpDisplay').innerText = state.xp;
+document.getElementById('xpBar').style.width = state.xp + '%';
+const totalMinutes = state.tasks.reduce((sum, t) => sum + t.duration, 0);
+let weightPct = Math.min((totalMinutes / 180) * 100, 100);
+document.getElementById('loadBar').style.width = weightPct + '%';
+let label = "Feather Light 🍃", icon = "🚶‍♂️";
+if (totalMinutes > 30) { label = "Easy Pace 🏃‍♂️"; icon = "🏃‍♂️"; }
+if (totalMinutes > 75) { label = "Heavy Burden 🏋️‍♂️"; icon = "🏋️‍♂️"; }
+if (totalMinutes > 130) { label = "Overloaded! 🌋"; icon = "😰"; }
+document.getElementById('weightLabel').innerText = label;
+document.getElementById('packIcon').innerText = icon;
+const lanes = { urgent: 'urgentList', routine: 'routineList', low: 'lowList' };
+Object.values(lanes).forEach(id => document.getElementById(id).innerHTML = '');
 state.tasks.forEach(task => {
+const laneId = lanes[task.priority] || 'routineList';
 const card = document.createElement('div');
 card.className = 'task-card';
-card.innerHTML =  <div class="task-main"><span>${task.text}</span><button class="complete-btn" onclick="completeTask('${task.id}')">Slay ⚔️</button></div> <div class="task-footer"><span>⏱️ ${task.duration}m</span><div> <span class="action-link" onclick="launchTimer('${task.id}','${task.text}',${task.duration})">⚡ Focus</span> <span class="action-link" style="color:#f43f5e;margin-left:10px;" onclick="delegateTask('${task.id}')">🤝 Delegate</span> <span class="action-link" style="color:#3b82f6;margin-left:10px;" onclick="moveTaskLane('${task.id}')">🔄 Shift</span> </div></div>;
-let targetLane = document.getElementById(${task.priority}List);
-if (targetLane) targetLane.appendChild(card);
+let borderCol = 'var(--accent)';
+if(task.priority === 'urgent') borderCol = 'var(--urgent-color)';
+if(task.priority === 'low') borderCol = 'var(--low-color)';
+card.style.borderLeftColor = borderCol;
+card.innerHTML = <div class="task-main"> <span style="font-weight:500;">${task.text}</span> <button class="complete-btn" onclick="completeTask('${task.id}', ${task.duration})">Done</button> </div> <div class="task-footer"> <span>⏱️ Estimated: ${task.duration} mins</span> <span class="action-link" onclick="startTimerTask('${task.id}', '${task.text.replace(/'/g, "\\'")}', ${task.duration})">Focus Quest ⚔️</span> </div>;
+document.getElementById(laneId).appendChild(card);
 });
 }
-calculateDaylightAndWeight();
-}
-window.onload = function() {
-calculateDaylightAndWeight();
-setInterval(calculateDaylightAndWeight, 60000);
-render();
-};
+setInterval(updateDaylightClock, 60000);
+renderAll();
