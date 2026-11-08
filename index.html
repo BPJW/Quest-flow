@@ -21,64 +21,32 @@
             display: flex; justify-content: center;
         }
         .container { width: 100%; max-width: 440px; }
-        
-        .dashboard {
-            background: var(--card-bg); padding: 15px; border-radius: 12px;
-            margin-bottom: 15px; border-bottom: 4px solid var(--xp-color);
-        }
+        .dashboard { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-bottom: 4px solid var(--xp-color); }
         .stat-row { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
         .xp-bar-container { background: #1f293d; height: 10px; border-radius: 5px; overflow: hidden; }
         .xp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width 0.4s ease; }
         .daylight-str { font-size: 0.95rem; font-weight: bold; color: #fff; margin-top: 8px; text-align: center; background: rgba(59,130,246,0.15); padding: 6px; border-radius: 6px; }
-
-        .backpack-zone {
-            background: #111c30; padding: 12px; border-radius: 10px;
-            margin-bottom: 15px; display: flex; align-items: center; gap: 12px;
-            border-left: 4px solid var(--xp-color);
-        }
+        .backpack-zone { background: #111c30; padding: 12px; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; gap: 12px; border-left: 4px solid var(--xp-color); }
         .backpack-avatar { font-size: 2rem; }
         .weight-bar-bg { background: #1f293d; height: 10px; border-radius: 5px; flex: 1; overflow: hidden; }
         .weight-bar { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); height: 100%; width: 0%; transition: width 0.4s; }
-        
-        .dump-zone {
-            background: #111c30; border: 2px dashed var(--xp-color);
-            padding: 15px; border-radius: 12px; margin-bottom: 20px;
-        }
-        textarea {
-            width: 100%; height: 110px; background: #070d18; border: 1px solid #1f293d;
-            border-radius: 8px; color: #fff; padding: 12px; box-sizing: border-box; 
-            font-family: inherit; font-size: 1rem; resize: none;
-        }
-        
-        .timer-box {
-            background: #162238; border: 1px solid #1f2d4d; padding: 12px; 
-            border-radius: 12px; text-align: center; margin-bottom: 20px;
-        }
+        .dump-zone { background: #111c30; border: 2px dashed var(--xp-color); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        textarea { width: 100%; height: 110px; background: #070d18; border: 1px solid #1f293d; border-radius: 8px; color: #fff; padding: 12px; box-sizing: border-box; font-family: inherit; font-size: 1rem; resize: none; }
+        .timer-box { background: #162238; border: 1px solid #1f2d4d; padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
         .timer-digits { font-size: 2.2rem; font-weight: bold; color: #34d399; font-variant-numeric: tabular-nums; }
-
         .lane { background: rgba(19, 27, 46, 0.4); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #1f293d; min-height: 60px;}
         .lane-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; }
-        
-        .task-card {
-            background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 8px;
-            border-left: 4px solid var(--accent); display: flex; flex-direction: column; gap: 8px;
-        }
+        .task-card { background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); display: flex; flex-direction: column; gap: 8px; }
         .task-main { display: flex; justify-content: space-between; align-items: center; }
         .task-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid #1f2d4d; padding-top: 6px; }
-
-        button {
-            padding: 10px 14px; border-radius: 6px; border: none;
-            background: var(--accent); color: #000; font-weight: bold; cursor: pointer;
-        }
+        button { padding: 10px 14px; border-radius: 6px; border: none; background: var(--accent); color: #000; font-weight: bold; cursor: pointer; }
         .btn-purple { background: #a855f7; color: #fff; width: 100%; margin-top: 8px; font-size: 1rem; }
         .action-link { color: #f59e0b; cursor: pointer; text-decoration: underline; }
         .complete-btn { padding: 6px 12px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <!-- Leveling Tracker Dashboard -->
     <div class="dashboard">
         <div class="stat-row">
             <span>✨ Hero Level: <span id="levelDisplay">1</span></span>
@@ -87,8 +55,6 @@
         <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
         <div class="daylight-str" id="timeLeftStr">Calculating daylight...</div>
     </div>
-
-    <!-- Visual Cognitive Overhead Weight Metaphor -->
     <div class="backpack-zone">
         <div class="backpack-avatar" id="packIcon">🚶‍♂️</div>
         <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
@@ -99,68 +65,48 @@
             <div class="weight-bar-bg"><div class="weight-bar" id="loadBar"></div></div>
         </div>
     </div>
-
-    <!-- Main Working Input Zone -->
     <div class="dump-zone">
         <h3 style="margin: 0 0 5px 0; color: var(--xp-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
         <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type tasks on separate lines. The system will prioritize them automatically.</p>
         <textarea id="brainDumpInput" placeholder="Example:&#10;Wash laundry&#10;Build an engine&#10;Fish tomorrow"></textarea>
         <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
     </div>
-
-    <!-- Audio Visual Focus Clock Component -->
     <div class="timer-box">
         <div class="timer-digits" id="clockFace">25:00</div>
         <p id="currentTimerTask" style="font-size:0.85rem; color:var(--text-dim); margin:4px 0 10px 0;">No active micro-quest selected</p>
         <button onclick="toggleClockEngine()" style="background:#3b82f6; color:#fff; font-size:0.8rem; padding:6px 14px;">Play / Pause Session</button>
     </div>
-
-    <!-- Categorized Folders -->
-    <div class="lane">
-        <div class="lane-title" style="color: var(--urgent-color);">🚨 URGENT (Do Right Now)</div>
-        <div id="urgentList"></div>
-    </div>
-
-    <div class="lane">
-        <div class="lane-title" style="color: #3b82f6;">📅 ROUTINE (Standard Pace)</div>
-        <div id="routineList"></div>
-    </div>
-
-    <div class="lane">
-        <div class="lane-title" style="color: var(--low-color);">⏳ BACKBURNER (Someday / Low Energy)</div>
-        <div id="lowList"></div>
-    </div>
+    <div class="lane"><div class="lane-title" style="color: var(--urgent-color);">🚨 URGENT (Do Right Now)</div><div id="urgentList"></div></div>
+    <div class="lane"><div class="lane-title" style="color: #3b82f6;">📅 ROUTINE (Standard Pace)</div><div id="routineList"></div></div>
+    <div class="lane"><div class="lane-title" style="color: var(--low-color);">⏳ BACKBURNER (Someday / Low Energy)</div><div id="lowList"></div></div>
 </div>
-
 <script>
-    // UNIQUE FRESH STORAGE SCOPE: Prevents old data structure conflict freezes completely
-    let state = JSON.parse(localStorage.getItem('questflow_v8_fresh')) || { tasks: [], xp: 0, level: 1 };
+    let state = { tasks: [], xp: 0, level: 1 };
     
-    let clockInterval = null;
-    let clockTimeRemaining = 25 * 60;
-    let clockRunning = false;
-    let activeTimerTaskId = null;
+    // SAFETY CHECK: Safely read database memory without causing rendering engine crashes
+    try {
+        let saved = localStorage.getItem('questflow_v9_master');
+        if (saved) { state = JSON.parse(saved); }
+    } catch(e) {}
+    
+    let clockInterval = null, clockTimeRemaining = 25 * 60, clockRunning = false, activeTimerTaskId = null;
 
     function saveState() { 
-        localStorage.setItem('questflow_v8_fresh', JSON.stringify(state)); 
+        try { localStorage.setItem('questflow_v9_master', JSON.stringify(state)); } catch(e) {}
     }
 
     function smashBrainDump() {
         const text = document.getElementById('brainDumpInput').value;
         if (!text.trim()) return;
 
-        // Splitting metric matches newlines, commas, or periods perfectly
         const rawItems = text.split(/\n|,|\./);
-        
         rawItems.forEach(item => {
             let taskText = item.trim();
             if (!taskText || taskText.length < 2) return;
 
-            let priority = 'routine'; 
-            let duration = 20;
+            let priority = 'routine', duration = 20;
             const lower = taskText.toLowerCase();
 
-            // Intelligent Common-Sense Parser Rules
             if (lower.includes('quick') || lower.includes('minute') || lower.includes('grab') || lower.includes('check') || lower.includes('fish')) duration = 15;
             if (lower.includes('clean') || lower.includes('cook') || lower.includes('shower') || lower.includes('wash') || lower.includes('laundry')) duration = 30;
             if (lower.includes('study') || lower.includes('project') || lower.includes('drive') || lower.includes('fix') || lower.includes('build') || lower.includes('engine')) duration = 60;
@@ -184,9 +130,9 @@
     }
 
     function moveTaskLane(id) {
+        if (!state.tasks) return;
         const task = state.tasks.find(t => t.id === id);
         if (task) {
-            // Rotates lanes systematically: Urgent -> Routine -> Backburner -> Urgent
             if (task.priority === 'urgent') task.priority = 'routine';
             else if (task.priority === 'routine') task.priority = 'low';
             else task.priority = 'urgent';
@@ -196,13 +142,76 @@
     }
 
     function delegateTask(id) {
+        if (!state.tasks) return;
         const task = state.tasks.find(t => t.id === id);
-        if (!task) return;
-        const smsMsg = encodeURIComponent(`Hey! I am running out of energy blocks today. Could you help me with this task: "${task.text}"? Thanks!`);
-        window.open(`sms:?&body=${smsMsg}`, '_blank');
+        if (task) window.open(`sms:?&body=${encodeURIComponent('Can you help me with: ' + task.text)}`, '_blank');
     }
 
     function launchTimer(id, text, duration) {
         activeTimerTaskId = id;
         document.getElementById('currentTimerTask').innerText = `Focusing on: ${text}`;
         clockTimeRemaining = duration * 60;
+        updateClockDisplay();
+        if(!clockRunning) toggleClockEngine();
+    }
+
+    function toggleClockEngine() {
+        if (clockRunning) { clearInterval(clockInterval); clockRunning = false; } 
+        else {
+            clockRunning = true;
+            clockInterval = setInterval(() => {
+                clockTimeRemaining--; updateClockDisplay();
+                if (clockTimeRemaining <= 0) {
+                    clearInterval(clockInterval); clockRunning = false;
+                    alert("Focus streak reached! +40 XP");
+                    if(activeTimerTaskId) completeTask(activeTimerTaskId);
+                }
+            }, 1000);
+        }
+    }
+
+    function updateClockDisplay() {
+        let m = Math.floor(clockTimeRemaining / 60), s = clockTimeRemaining % 60;
+document.getElementById('clockFace').innerText = ${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s};
+}
+function completeTask(id) {
+if (!state.tasks) return;
+state.tasks = state.tasks.filter(t =>  !== id);
+state.xp += 25;
+if (state.xp >= 100) { state.level++; state.xp -= 100; }
+saveState();
+render();
+}
+function calculateDaylightAndWeight() {
+const now = new Date(), capDay = new Date();
+capDay.setHours(22, 0, 0, 0);
+let diff = capDay - now;
+document.getElementById('timeLeftStr').innerText = diff > 0 ? ⏳ ${Math.floor(diff/3600000)}h ${Math.floor((diff%3600000)/60000)}m remaining today. : "🌙 Day complete! Rest up.";
+if (!state.tasks) state.tasks = [];
+const mins = state.tasks.reduce((acc, t) => acc + t.duration, 0);
+const pct = Math.min((mins / 180) * 100, 100);
+document.getElementById('loadBar').style.width = ${pct}%;
+document.getElementById('weightLabel').innerText = mins === 0 ? "Feather Light" : pct < 40 ? "Comfortable Load" : pct < 75 ? "Getting Heavy" : "CRITICAL OVERLOAD!";
+document.getElementById('packIcon').innerText = mins === 0 ? "🚶‍♂️" : pct < 75 ? "🏋️‍♂️" : "🛑";
+}
+function render() {
+document.getElementById('levelDisplay').innerText = state.level || 1;
+document.getElementById('xpDisplay').innerText = state.xp || 0;
+document.getElementById('xpBar').style.width = ${state.xp || 0}%;
+document.getElementById('urgentList').innerHTML = '';
+document.getElementById('routineList').innerHTML = '';
+document.getElementById('lowList').innerHTML = '';
+if (state.tasks && state.tasks.length > 0) {
+state.tasks.forEach(task => {
+const card = document.createElement('div');
+card.className = 'task-card';
+card.innerHTML =  <div class="task-main"><span>${task.text}</span><button class="complete-btn" onclick="completeTask('${}')">Slay ⚔️</button></div> <div class="task-footer"><span>⏱️ ${task.duration}m</span><div> <span class="action-link" onclick="launchTimer('${task.id}','${task.text}',${task.duration})">⚡ Focus</span> <span class="action-link" style="color:#f43f5e;margin-left:10px;" onclick="delegateTask('${task.id}')">🤝 Delegate</span> <span class="action-link" style="color:#3b82f6;margin-left:10px;" onclick="moveTaskLane('${task.id}')">🔄 Shift</span> </div></div>;
+let targetLane = document.getElementById(${task.priority}List);
+if (targetLane) targetLane.appendChild(card);
+});
+}
+calculateDaylightAndWeight();
+}
+calculateDaylightAndWeight();
+setInterval(calculateDaylightAndWeight, 60000);
+render();
