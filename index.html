@@ -100,7 +100,7 @@
 
     <div class="dump-zone">
         <h3 style="margin: 0 0 5px 0; color: var(--xp-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
-        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type your tasks. Hit enter for new lines, or use commas.</p>
+        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type tasks on separate lines. The system will categorize them automatically.</p>
         <textarea id="brainDumpInput" placeholder="Example:&#10;Wash laundry&#10;Build an engine&#10;Fish tomorrow"></textarea>
         <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
     </div>
@@ -128,15 +128,12 @@
 </div>
 
 <script>
-    // SELF-CLEANING MECHANISM: Safely wipes bad data loops on first load
+    // HARD SYSTEM RESET: Erases corrupted legacy storage structures instantly
     try {
-        localStorage.removeItem('questflow_state');
-        localStorage.removeItem('questflow_v2');
-        localStorage.removeItem('questflow_v3_state');
-        localStorage.removeItem('questflow_v4_state');
+        localStorage.clear();
     } catch(e) {}
 
-    let state = JSON.parse(localStorage.getItem('questflow_v6_state')) || { tasks: [], xp: 0, level: 1 };
+    let state = { tasks: [], xp: 0, level: 1 };
     
     let clockInterval = null;
     let clockTimeRemaining = 25 * 60;
@@ -144,14 +141,15 @@
     let activeTimerTaskId = null;
 
     function saveState() { 
-        localStorage.setItem('questflow_v6_state', JSON.stringify(state)); 
+        try { localStorage.setItem('questflow_v7_clean', JSON.stringify(state)); } catch(e) {}
     }
 
     function smashBrainDump() {
         const text = document.getElementById('brainDumpInput').value;
         if (!text.trim()) return;
 
-        const rawItems = text.split(/\n|,|\.|\band\b|\bthen\b/i);
+        // Process line breaks (\n), commas, or explicit "and" operators
+        const rawItems = text.split(/\n|,|\.|\band\b/i);
         
         rawItems.forEach(item => {
             let taskText = item.trim();
@@ -159,9 +157,9 @@
 
             let priority = 'routine'; 
             let duration = 20;
-
             const lower = taskText.toLowerCase();
 
+            // Automated Priority & Duration Rules
             if (lower.includes('quick') || lower.includes('minute') || lower.includes('grab') || lower.includes('check') || lower.includes('fish')) duration = 15;
             if (lower.includes('clean') || lower.includes('cook') || lower.includes('shower') || lower.includes('wash') || lower.includes('laundry')) duration = 30;
             if (lower.includes('study') || lower.includes('project') || lower.includes('drive') || lower.includes('fix') || lower.includes('build') || lower.includes('engine')) duration = 60;
@@ -212,3 +210,5 @@
 
     function toggleClockEngine() {
         if (clockRunning) {
+            clearInterval(clockInterval);
+            clockRunning = false;
