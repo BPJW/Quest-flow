@@ -1,179 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuestFlow Pro</title>
-    <style>
-        :root {
-            --bg-color: #0b111e;
-            --card-bg: #162238;
-            --accent: #10b981;
-            --xp-color: #3b82f6;
-            --urgent-color: #ef4444;
-            --low-color: #6b7280;
-            --text: #f3f4f6;
-            --text-dim: #9ca3af;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color); color: var(--text); margin: 0; padding: 15px;
-            display: flex; justify-content: center;
-        }
-        .container { width: 100%; max-width: 440px; }
-        .dashboard { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-bottom: 4px solid var(--xp-color); }
-        .stat-row { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
-        .xp-bar-container { background: #1f293d; height: 10px; border-radius: 5px; overflow: hidden; }
-        .xp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width 0.4s ease; }
-        .daylight-str { font-size: 0.95rem; font-weight: bold; color: #fff; margin-top: 8px; text-align: center; background: rgba(59,130,246,0.15); padding: 6px; border-radius: 6px; }
-        .backpack-zone { background: #111c30; padding: 12px; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; gap: 12px; border-left: 4px solid var(--xp-color); }
-        .backpack-avatar { font-size: 2rem; }
-        .weight-bar-bg { background: #1f293d; height: 10px; border-radius: 5px; flex: 1; overflow: hidden; }
-        .weight-bar { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); height: 100%; width: 0%; transition: width 0.4s; }
-        .dump-zone { background: #111c30; border: 2px dashed var(--xp-color); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
-        textarea { width: 100%; height: 110px; background: #070d18; border: 1px solid #1f293d; border-radius: 8px; color: #fff; padding: 12px; box-sizing: border-box; font-family: inherit; font-size: 1rem; resize: none; }
-        .timer-box { background: #162238; border: 1px solid #1f2d4d; padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
-        .timer-digits { font-size: 2.2rem; font-weight: bold; color: #34d399; font-variant-numeric: tabular-nums; }
-        .lane { background: rgba(19, 27, 46, 0.4); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #1f293d; min-height: 60px;}
-        .lane-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; }
-        .task-card { background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); display: flex; flex-direction: column; gap: 8px; }
-        .task-main { display: flex; justify-content: space-between; align-items: center; }
-        .task-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid #1f2d4d; padding-top: 6px; }
-        button { padding: 10px 14px; border-radius: 6px; border: none; background: var(--accent); color: #000; font-weight: bold; cursor: pointer; }
-        .btn-purple { background: #a855f7; color: #fff; width: 100%; margin-top: 8px; font-size: 1rem; }
-        .action-link { color: #f59e0b; cursor: pointer; text-decoration: underline; }
-        .complete-btn { padding: 6px 12px; font-size: 0.85rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuestFlow Pro</title>
+<style>
+:root {
+--bg-color: #0b111e;
+--card-bg: #162238;
+--accent: #10b981;
+--xp-color: #3b82f6;
+--urgent-color: #ef4444;
+--low-color: #6b7280;
+--text: #f3f4f6;
+--text-dim: #9ca3af;
+}
+body {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
+serif;
+background-color: var(--bg-color); color: var(--text); margin: 0; padding:
+15px;
+display: flex; justify-content: center;
+}
+.container { width: 100%; max-width: 440px; }
+.dashboard { background: var(--card-bg); padding: 15px; border-radius: 12px;
+margin-bottom: 15px; border-bottom: 4px solid var(--xp-color); }
+.stat-row { display: flex; justify-content: space-between; font-weight: bold;
+margin-bottom: 8px; }
+.xp-bar-container { background: #1f293d; height: 10px; border-radius: 5px;
+overflow: hidden; }
+.xp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width
+0.4s ease; }
+.daylight-str { font-size: 0.95rem; font-weight: bold; color: #fff; margin-top:
+8px; text-align: center; background: rgba(59,130,246,0.15); padding: 6px; border-radius:
+6px; }
+.backpack-zone { background: #111c30; padding: 12px; border-radius: 10px; margin-
+bottom: 15px; display: flex; align-items: center; gap: 12px; border-left: 4px solid
+var(--xp-color); }
+.backpack-avatar { font-size: 2rem; }
+.weight-bar-bg { background: #1f293d; height: 10px; border-radius: 5px; flex: 1;
+overflow: hidden; }
+.weight-bar { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);
+height: 100%; width: 0%; transition: width 0.4s; }
+.dump-zone { background: #111c30; border: 2px dashed var(--xp-color); padding:
+15px; border-radius: 12px; margin-bottom: 20px; }
+textarea { width: 100%; height: 110px; background: #070d18; border: 1px solid
+#1f293d; border-radius: 8px; color: #fff; padding: 12px; box-sizing: border-box; font-
+family: inherit; font-size: 1rem; resize: none; }
+.timer-box { background: #162238; border: 1px solid #1f2d4d; padding: 12px;
+border-radius: 12px; text-align: center; margin-bottom: 20px; }
+.timer-digits { font-size: 2.2rem; font-weight: bold; color: #34d399; font-
+variant-numeric: tabular-nums; }
+.lane { background: rgba(19, 27, 46, 0.4); padding: 12px; border-radius: 12px;
+margin-bottom: 15px; border: 1px solid #1f293d; min-height: 60px;}
+.lane-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; }
+.task-card { background: var(--card-bg); padding: 12px; border-radius: 8px;
+margin-bottom: 8px; border-left: 4px solid var(--accent); display: flex; flex-direction:
+column; gap: 8px; }
+.task-main { display: flex; justify-content: space-between; align-items:
+center; }
+.task-footer { display: flex; justify-content: space-between; align-items:
+center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid #1f2d4d;
+padding-top: 6px; }
+button { padding: 10px 14px; border-radius: 6px; border: none; background: var(--
+accent); color: #000; font-weight: bold; cursor: pointer; }
+.btn-purple { background: #a855f7; color: #fff; width: 100%; margin-top: 8px;
+font-size: 1rem; }
+.action-link { color: #f59e0b; cursor: pointer; text-decoration: underline; }
+.complete-btn { padding: 6px 12px; font-size: 0.85rem; }
 </head>
 <body>
 <div class="container">
-    <div class="dashboard">
-        <div class="stat-row">
-            <span>✨ Hero Level: <span id="levelDisplay">1</span></span>
-            <span>⭐ XP: <span id="xpDisplay">0</span>/100</span>
-        </div>
-        <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
-        <div class="daylight-str" id="timeLeftStr">Calculating daylight...</div>
-    </div>
-    <div class="backpack-zone">
-        <div class="backpack-avatar" id="packIcon">🚶‍♂️</div>
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
-                <span>Backpack Weight (Task Burden)</span>
-                <span id="weightLabel">Feather Light</span>
-            </div>
-            <div class="weight-bar-bg"><div class="weight-bar" id="loadBar"></div></div>
-        </div>
-    </div>
-    <div class="dump-zone">
-        <h3 style="margin: 0 0 5px 0; color: var(--xp-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
-        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type tasks on separate lines. The system will prioritize them automatically.</p>
-        <textarea id="brainDumpInput" placeholder="Example:\nWash laundry\nBuild an engine\nFish tomorrow"></textarea>
-        <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
-    </div>
-    <div class="timer-box">
-        <div class="timer-digits" id="clockFace">25:00</div>
-        <p id="currentTimerTask" style="font-size:0.85rem; color:var(--text-dim); margin:4px 0 10px 0;">No active micro-quest selected</p>
-        <button onclick="toggleClockEngine()" style="background:#3b82f6; color:#fff; font-size:0.8rem; padding:6px 14px;">Play / Pause Session</button>
-    </div>
-    <div class="lane"><div class="lane-title" style="color: var(--urgent-color);">🚨 URGENT (Do Right Now)</div><div id="urgentList"></div></div>
-    <div class="lane"><div class="lane-title" style="color: #3b82f6;">📅 ROUTINE (Standard Pace)</div><div id="routineList"></div></div>
-    <div class="lane"><div class="lane-title" style="color: var(--low-color);">⏳ BACKBURNER (Someday / Low Energy)</div><div id="lowList"></div></div>
+<div class="dashboard">
+<div class="stat-row">
+<span>✨ Hero Level: <span id="levelDisplay">1</span></span>
+<span>⭐ XP: <span id="xpDisplay">0</span>/100</span>
 </div>
-
+<div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
+<div class="daylight-str" id="timeLeftStr">Calculating daylight...</div>
+</div>
+<div class="backpack-zone">
+<div class="backpack-avatar" id="packIcon">🚶‍♂️</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+<div style="display: flex; justify-content: space-between; font-size: 0.8rem;
+font-weight: bold;">
+<span>Backpack Weight (Task Burden)</span>
+<span id="weightLabel">Feather Light</span>
+</div>
+<div class="weight-bar-bg"><div class="weight-bar" id="loadBar"></div></div>
+</div>
+<div class="dump-zone">
+<h3 style="margin: 0 0 5px 0; color: var(--xp-color); font-size: 1.05rem;">🧠
+Chaos Brain Dump</h3>
+<p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type
+tasks on separate lines. The system will prioritize them automatically.</p>
+<textarea id="brainDumpInput" placeholder="Wash laundry&#10;Build an
+engine&#10;Fish tomorrow"></textarea>
+<button class="btn-purple" onclick="smashBrainDump()">Sort & Organize
+Automatically ✨</button>
+<div class="timer-box">
+<div class="timer-digits" id="clockFace">25:00</div>
+<p id="currentTimerTask" style="font-size:0.85rem; color:var(--text-dim); margin:
+4px 0 10px 0;">No active micro-quest selected</p>
+<button onclick="toggleClockEngine()" style="background:#3b82f6; color:#fff;
+font-size:0.8rem; padding:6px 14px;">Play / Pause Session</button>
+</div>
+<div class="lane"><div class="lane-title" style="color: var(--urgent-color);">🚨
+URGENT (Do Right Now)</div><div id="urgentList"></div></div>
+<div class="lane"><div class="lane-title" style="color: #3b82f6;">📅 ROUTINE
+(Standard Pace)</div><div id="routineList"></div></div>
+<div class="lane"><div class="lane-title" style="color: var(--low-color);">⏳
+BACKBURNER (Someday / Low Energy)</div><div id="lowList"></div></div>
+</div>
 <script>
-    let state = { tasks: [], xp: 0, level: 1 };
-    try {
-        let saved = localStorage.getItem('questflow_v12_final');
-        if (saved) { state = JSON.parse(saved); }
-    } catch(e) {}
-    
-    let clockInterval = null, clockTimeRemaining = 25 * 60, clockRunning = false, activeTimerTaskId = null;
-
-    function saveState() { 
-        try { localStorage.setItem('questflow_v12_final', JSON.stringify(state)); } catch(e) {}
-    }
-
-    function updateDaylightClock() {
-        const now = new Date();
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
-        const diffMs = endOfDay - now;
-        const hrs = Math.floor(diffMs / (1000 * 60 * 60));
-        const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        document.getElementById('timeLeftStr').innerText = `⏳ ${hrs}h ${mins}m of daylight remaining today`;
-    }
-
-    function smashBrainDump() {
-        const text = document.getElementById('brainDumpInput').value;
-        if (!text.trim()) return;
-        const rawItems = text.split(/\n|,|\./);
-        rawItems.forEach(item => {
-            let taskText = item.trim();
-            if (!taskText || taskText.length < 2) return;
-            let priority = 'routine', duration = 20;
-            const lower = taskText.toLowerCase();
-            if (lower.includes('quick') || lower.includes('minute') || lower.includes('grab') || lower.includes('check') || lower.includes('fish')) duration = 15;
-            if (lower.includes('clean') || lower.includes('cook') || lower.includes('shower') || lower.includes('wash') || lower.includes('laundry')) duration = 30;
-            if (lower.includes('study') || lower.includes('project') || lower.includes('drive') || lower.includes('fix') || lower.includes('build') || lower.includes('engine')) duration = 60;
-            if (lower.includes('asap') || lower.includes('now') || lower.includes('today') || lower.includes('deadline') || lower.includes('wash') || lower.includes('build')) priority = 'urgent';
-            if (lower.includes('later') || lower.includes('someday') || lower.includes('whenever') || lower.includes('maybe') || lower.includes('fish')) priority = 'low';
-            
-            state.tasks.push({ 
-                id: 't-' + Date.now() + Math.random().toString(36).substr(2, 4), 
-                text: taskText.charAt(0).toUpperCase() + taskText.slice(1), 
-                priority: priority, 
-                duration: duration 
-            });
-        });
-        document.getElementById('brainDumpInput').value = '';
-        gainXP(15);
-        renderAll();
-    }
-
-    function gainXP(amount) {
-        state.xp += amount;
-        while (state.xp >= 100) {
-            state.xp -= 100;
-            state.level++;
-            alert(`🎉 Level Up! You reached Hero Level ${state.level}!`);
-        }
-        saveState();
-    }
-
-    function completeTask(id, duration) {
-        state.tasks = state.tasks.filter(t => t.id !== id);
-        if (activeTimerTaskId === id) {
-            stopClock();
-            activeTimerTaskId = null;
-            document.getElementById('currentTimerTask').innerText = "No active micro-quest selected";
-        }
-        gainXP(duration);
-        renderAll();
-    }
-
-    function startTimerTask(id, text, duration) {
-        activeTimerTaskId = id;
-        clockTimeRemaining = duration * 60;
-        document.getElementById('currentTimerTask').innerText = `🎯 Quest: ${text}`;
-        updateClockFace();
-        if (!clockRunning) {
-            toggleClockEngine();
-        }
-    }
-
-    function toggleClockEngine() {
-        if (clockRunning) {
-            stopClock();
-        } else {
-            clockRunning = true;
-            clockInterval = setInterval(() => {
-                if (clockTimeRemaining > 0) {
-                    clockTimeRemaining--;
-                    updateClockFace();
-                } else {
-                    stopClock();
-alert("⏰ Micro-quest session finished! Claim your reward by completing the task.");
+try {
+let state = { tasks: [], xp: 0, level: 1 };
+let saved = localStorage.getItem('questflow_v12_final');
+if (saved) { state = JSON.parse(saved); }
+} catch(e) {}
+let clockInterval = null, clockTimeRemaining = 25 * 60, clockRunning = false,
+activeTimerTaskId = null;
+function saveState() {
+try { localStorage.setItem('questflow_v12_final', JSON.stringify(state)); }
+catch(e) {}
+}
+function updateDaylightClock() {
+const now = new Date();
+const endOfDay = new Date();
+endOfDay.setHours(23, 59, 59, 999);
+const diffMs = endOfDay - now;
+const hrs = Math.floor(diffMs / (1000 * 60 * 60));
+const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+const elem = document.getElementById('timeLeftStr');
+if (elem) {
+elem.innerText = `⏳ ${hrs}h ${mins}m of daylight remaining today`;
+}
+}
+function smashBrainDump() {
+const text = document.getElementById('brainDumpInput').value;
+if (!text.trim()) return;
+const rawItems = text.split(/\n|,|\./);
+rawItems.forEach(item => {
+let taskText = item.trim();
+if (!taskText || taskText.length < 2) return;
+let priority = 'routine', duration = 20;
+const lower = taskText.toLowerCase();
+if (lower.includes('quick') || lower.includes('minute') ||
+lower.includes('grab') || lower.includes('check') || lower.includes('fish')) duration =
+15;
+if (lower.includes('clean') || lower.includes('cook') ||
+lower.includes('shower') || lower.includes('wash') || lower.includes('laundry')) duration
+= 30;
+if (lower.includes('study') || lower.includes('project') ||
+lower.includes('drive') || lower.includes('fix') || lower.includes('build') ||
+lower.includes('engine')) duration = 60;
+if (lower.includes('asap') || lower.includes('now') ||
+lower.includes('today') || lower.includes('deadline') || lower.includes('wash') ||
+lower.includes('build')) priority = 'urgent';
+if (lower.includes('later') || lower.includes('someday') ||
+lower.includes('whenever') || lower.includes('maybe') || lower.includes('fish')) priority
+= 'low';
+state.tasks.push({
+id: 't-' + Math.random().toString(36).substring(2, 9),
+text: taskText.charAt(0).toUpperCase() + taskText.slice(1),
+priority: priority,
+duration: duration
+});
+});
+document.getElementById('brainDumpInput').value = '';
+gainXP(15);
+renderAll();
+}
+function gainXP(amount) {
+state.xp += amount;
+while (state.xp >= 100) {
+state.xp -= 100;
+}
+state.level++;
+alert(`🎉 Level Up! You reached Hero Level ${state.level}!`);
+saveState();
+}
+function completeTask(id, duration) {
+state.tasks = state.tasks.filter(t => t.id !== id);
+if (activeTimerTaskId === id) {
+stopClock();
+activeTimerTaskId = null;
+document.getElementById('currentTimerTask').innerText = "No active micro-
+quest selected";
+}
+gainXP(duration);
+renderAll();
+}
+function startTimerTask(id, text, duration) {
+activeTimerTaskId = id;
+clockTimeRemaining = duration * 60;
+document.getElementById('currentTimerTask').innerText = `🎯 Quest: ${text}`;
+updateClockFace();
+if (!clockRunning) {
+toggleClockEngine();
+}
+}
+function toggleClockEngine() {
+if (clockRunning) {
+stopClock();
+} else {
+clockRunning = true;
+clockInterval = setInterval(() => {
+if (clockTimeRemaining > 0) {
+clockTimeRemaining--;
+updateClockFace();
+} else {
+stopClock();
+alert("⏰ Micro-quest session finished! Claim your reward by
+completing the task.");
 }
 }, 1000);
 }
@@ -185,7 +224,7 @@ clearInterval(clockInterval);
 function updateClockFace() {
 const m = Math.floor(clockTimeRemaining / 60).toString().padStart(2, '0');
 const s = (clockTimeRemaining % 60).toString().padStart(2, '0');
-document.getElementById('clockFace').innerText = ${m}:${s};
+document.getElementById('clockFace').innerText = `${m}:${s}`;
 }
 function renderAll() {
 saveState();
@@ -203,18 +242,34 @@ if (totalMinutes > 130) { label = "Overloaded! 🌋"; icon = "😰"; }
 document.getElementById('weightLabel').innerText = label;
 document.getElementById('packIcon').innerText = icon;
 const lanes = { urgent: 'urgentList', routine: 'routineList', low: 'lowList' };
-Object.values(lanes).forEach(id => document.getElementById(id).innerHTML = '');
+Object.values(lanes).forEach(id => {
+const laneElem = document.getElementById(id);
+if (laneElem) laneElem.innerHTML = '';
+});
 state.tasks.forEach(task => {
 const laneId = lanes[task.priority] || 'routineList';
+const laneContainer = document.getElementById(laneId);
+if (!laneContainer) return;
 const card = document.createElement('div');
 card.className = 'task-card';
 let borderCol = 'var(--accent)';
 if(task.priority === 'urgent') borderCol = 'var(--urgent-color)';
 if(task.priority === 'low') borderCol = 'var(--low-color)';
 card.style.borderLeftColor = borderCol;
-card.innerHTML = <div class="task-main"> <span style="font-weight:500;">${task.text}</span> <button class="complete-btn" onclick="completeTask('${task.id}', ${task.duration})">Done</button> </div> <div class="task-footer"> <span>⏱️ Estimated: ${task.duration} mins</span> <span class="action-link" onclick="startTimerTask('${task.id}', '${task.text.replace(/'/g, "\\'")}', ${task.duration})">Focus Quest ⚔️</span> </div>;
-document.getElementById(laneId).appendChild(card);
+const safeText = task.text.replace(/'/g, "\\'").replace(/"/g, '"');
+card.innerHTML = `
+\${task.text}
+Done
+⏱️ Estimated: \${task.duration} mins
+Focus Quest ⚔️
+`;
+laneContainer.appendChild(card);
 });
 }
+window.onload = function() {
 setInterval(updateDaylightClock, 60000);
 renderAll();
+};
+</script>
+</body>
+</html>
