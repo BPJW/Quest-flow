@@ -108,7 +108,7 @@
     <!-- Main Working Input Zone -->
     <div class="dump-zone">
         <h3 style="margin: 0 0 5px 0; color: var(--xp-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
-        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type your ran-on thoughts completely raw. Use commas, periods, or "and then" to separate tasks.</p>
+        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type your raw thoughts completely raw. Use commas, periods, or "and then" to separate tasks.</p>
         <textarea id="brainDumpInput" placeholder="Example: wash laundry today, fix car tire asap, call doctor later..."></textarea>
         <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
     </div>
@@ -150,7 +150,7 @@
     }
 
     // High Reliability Run-On Sentence Processing Script
-     Lah smashBrainDump() {
+    function smashBrainDump() {
         const text = document.getElementById('brainDumpInput').value;
         if (!text.trim()) return;
 
