@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuestFlow Pro - ADHD Hub</title>
+    <title>QuestFlow Master - ADHD Cognitive Hub</title>
     <style>
         :root {
-            --bg-color: #0b111e;
-            --card-bg: #162238;
+            --bg-color: #0a0e17;
+            --card-bg: #131b2e;
             --accent: #10b981;
             --xp-color: #3b82f6;
-            --dump-color: #a855f7;
+            --urgent-color: #ef4444;
+            --low-color: #6b7280;
             --text: #f3f4f6;
             --text-dim: #9ca3af;
         }
@@ -18,168 +19,184 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color); color: var(--text); margin: 0; padding: 15px;
             display: flex; justify-content: center;
+            background-image: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent), radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.03), transparent);
         }
         .container { width: 100%; max-width: 440px; }
+        
+        /* Dashboard & Time Gauge */
         .dashboard {
-            background: var(--card-bg); padding: 15px; border-radius: 12px;
-            margin-bottom: 15px; border-bottom: 4px solid var(--xp-color);
+            background: var(--card-bg); padding: 15px; border-radius: 16px;
+            margin-bottom: 15px; border: 1px solid #1f2d4d; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
-        .stat-row { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
-        .xp-bar-container { background: #1f293d; height: 10px; border-radius: 5px; overflow: hidden; }
-        .xp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width 0.4s ease; }
+        .gauge-container { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.85rem; }
         
-        /* Brain Dump Box */
-        .dump-zone {
-            background: #111c30; border: 2px dashed var(--dump-color);
-            padding: 15px; border-radius: 12px; margin-bottom: 20px;
+        /* Backpack Load Metaphor Visualizer */
+        .backpack-zone {
+            background: #111827; padding: 12px; border-radius: 12px;
+            margin-bottom: 15px; display: flex; align-items: center; gap: 15px;
+            border-left: 4px solid var(--xp-color);
         }
-        textarea {
-            width: 100%; height: 80px; background: #070d18; border: 1px solid #1f293d;
-            border-radius: 8px; color: #fff; padding: 10px; box-sizing: border-box; font-family: inherit; resize: none;
-        }
-        
-        /* Category Folders */
-        .category-section { margin-top: 20px; }
-        .category-header {
-            font-size: 1rem; font-weight: bold; margin-bottom: 10px;
-            display: flex; align-items: center; gap: 6px;
-        }
-        .task-card {
-            background: var(--card-bg); padding: 12px; border-radius: 8px;
-            margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
-            animation: slideIn 0.2s ease;
-        }
-        .tag { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; color: #fff; }
-        .tag-urgent { background: #ef4444; }
-        .tag-routine { background: #3b82f6; }
-        .tag-low { background: #6b7280; }
+        .backpack-avatar { font-size: 2.2rem; filter: drop-shadow(0 0 8px var(--xp-color)); transition: transform 0.3s; }
+        .weight-bar-bg { background: #1f293d; height: 12px; border-radius: 6px; width: 100%; overflow: hidden; margin-top: 4px; }
+        .weight-bar { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); height: 100%; width: 0%; transition: width 0.5s ease; }
 
-        button {
-            padding: 10px 14px; border-radius: 6px; border: none;
-            background: var(--accent); color: #000; font-weight: bold; cursor: pointer;
+        /* Voice/Text Core Control Area */
+        .input-hub {
+            background: #111c30; border: 2px dashed #3b82f6; padding: 15px; border-radius: 14px; margin-bottom: 20px;
         }
-        .btn-purple { background: var(--dump-color); color: #fff; width: 100%; margin-top: 8px; }
+        .mic-btn {
+            background: #3b82f6; color: #fff; width: 100%; padding: 12px; font-weight: bold;
+            border-radius: 8px; border: none; cursor: pointer; margin-top: 8px; display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .mic-active { background: #ef4444; animation: pulse 1.5s infinite; }
+
+        /* Smooth Timer Block */
+        .timer-box {
+            background: #182238; border: 1px solid #2d3d66; padding: 15px; border-radius: 12px;
+            text-align: center; margin-bottom: 20px;
+        }
+        .timer-digits { font-size: 2.5rem; font-weight: bold; color: #34d399; font-variant-numeric: tabular-nums; }
+
+        /* Drag-Drop Lane Structures */
+        .lane { background: rgba(19, 27, 46, 0.5); padding: 12px; border-radius: 12px; margin-bottom: 15px; min-height: 60px; border: 1px solid #1f293d; }
+        .lane-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; }
         
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .task-card {
+            background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 8px;
+            border-left: 4px solid var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; gap: 6px; cursor: grab;
+        }
+        .task-main { display: flex; justify-content: space-between; align-items: center; }
+        .task-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-dim); border-top: 1px solid #1f2d4d; padding-top: 6px; }
+        
+        .move-select {
+            background: #1f293d; color: #fff; border: 1px solid #3b82f6;
+            font-size: 0.75rem; padding: 2px; border-radius: 4px; outline: none;
+        }
+        .action-link { color: #f59e0b; cursor: pointer; text-decoration: underline; }
+        .complete-btn { background: var(--accent); color: #000; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: none; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Player Stats -->
     <div class="dashboard">
         <div class="stat-row">
-            <span>✨ Hero Level: <span id="levelDisplay">1</span></span>
-            <span style="color: var(--accent);">⭐ XP: <span id="xpDisplay">0</span>/100</span>
+            <span>✨ Level <span id="lvl">1</span> Hero</span>
+            <span style="color: var(--accent);">🔋 Operational Day Tracker</span>
         </div>
-        <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
+        <div class="gauge-container">
+            <span id="timeLeftStr">Calculating remaining daylight...</span>
+        </div>
     </div>
 
-    <!-- Brain Dump Space -->
-    <div class="dump-zone">
-        <h3 style="margin: 0 0 5px 0; color: var(--dump-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
-        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type everything stressing you out in one big messy sentence. Let the app sort it.</p>
-        <textarea id="brainDumpInput" placeholder="Example: clean my room today, call mom tomorrow, buy milk later, fix car ASAP..."></textarea>
-        <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
+    <div class="backpack-zone">
+        <div class="backpack-avatar" id="packIcon">🚶‍♂️</div>
+        <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
+                <span>Backpack Weight (Task Burden)</span>
+                <span id="weightLabel">Empty</span>
+            </div>
+            <div class="weight-bar-bg"><div class="weight-bar" id="loadBar"></div></div>
+        </div>
     </div>
 
-    <!-- Automated Lists -->
-    <div class="category-section">
-        <div class="category-header" style="color: #ef4444;">🚨 Urgent Quests (Do Now)</div>
-        <div id="urgentList"></div>
+    <div class="input-hub">
+        <h3 style="margin:0 0 4px 0; color:#3b82f6; font-size:1rem;">🎙️ Hands-Free Run-On Voice Smasher</h3>
+        <p style="margin:0 0 10px 0; font-size:0.75rem; color:var(--text-dim);">Tap mic and speak continuously. The app will automatically slice your run-on sentences into isolated tasks and estimate time.</p>
+        <textarea id="capturedTextTextarea" placeholder="Speak or type your raw thought loop here..."></textarea>
+        <button id="micButton" class="mic-btn" onclick="toggleVoiceCapture()">🎵 Tap to Stream Voice Input</button>
     </div>
 
-    <div class="category-section">
-        <div class="category-header" style="color: #3b82f6;">📅 Routine & Tasks</div>
-        <div id="routineList"></div>
+    <div class="timer-box">
+        <div class="timer-digits" id="clockFace">25:00</div>
+        <p id="currentTimerTask" style="font-size:0.8rem; color:var(--text-dim); margin:4px 0 10px 0;">No active micro-quest selected</p>
+        <button onclick="toggleClockEngine()" style="background:#3b82f6; color:#fff; font-size:0.8rem; padding:6px 14px;">Play / Pause Session</button>
     </div>
 
-    <div class="category-section">
-        <div class="category-header" style="color: #6b7280;">⏳ Backburner (Someday)</div>
-        <div id="lowList"></div>
+    <div class="lane" id="lane-urgent" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'urgent')">
+        <div class="lane-title" style="color:var(--urgent-color);"><span>🚨 URGENT (Do Right Now)</span></div>
+        <div id="box-urgent"></div>
+    </div>
+
+    <div class="lane" id="lane-routine" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'routine')">
+        <div class="lane-title" style="color:#3b82f6;"><span>📅 ROUTINE (Standard Pace)</span></div>
+        <div id="box-routine"></div>
+    </div>
+
+    <div class="lane" id="lane-low" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'low')">
+        <div class="lane-title" style="color:var(--low-color);"><span>⏳ BACKBURNER (Someday / Low Energy)</span></div>
+        <div id="box-low"></div>
     </div>
 </div>
 
 <script>
-    let state = JSON.parse(localStorage.getItem('questflow_v2')) || { tasks: [], xp: 0, level: 1 };
+    let coreState = JSON.parse(localStorage.getItem('questflow_master_state')) || {
+        backlog: [], xp: 0, level: 1
+    };
 
-    function save() { localStorage.setItem('questflow_v2', JSON.stringify(state)); }
+    let audioCtx = null;
+    let clockInterval = null;
+    let clockTimeRemaining = 25 * 60;
+    let clockRunning = false;
+    let activeTimerTaskId = null;
 
-    // THE AUTOMATED SORTING ALGORITHM
-    function smashBrainDump() {
-        const text = document.getElementById('brainDumpInput').value;
-        if (!text.trim()) return;
+    function playChimeEffect(type) {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
 
-        // Split text by commas, periods, or the word "and" to isolate tasks
-        const rawItems = text.split(/,|\.| and /);
-        
-        rawItems.forEach(item => {
-            let taskText = item.trim();
-            if (!taskText || taskText.length < 3) return;
-
-            let priority = 'routine'; // Default lane
-
-            // Automated Priority Keyword Matching
-            const urgentKeywords = ['asap', 'urgent', 'today', 'now', 'important', 'fix'];
-            const lowKeywords = ['later', 'someday', 'maybe', 'next week', 'whenever'];
-
-            if (urgentKeywords.some(word => taskText.toLowerCase().includes(word))) {
-                priority = 'urgent';
-            } else if (lowKeywords.some(word => taskText.toLowerCase().includes(word))) {
-                priority = 'low';
+            if (type === 'success') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'pop') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(330, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
             }
-
-            state.tasks.push({
-                id: Date.now() + Math.random(),
-                text: taskText,
-                priority: priority
-            });
-        });
-
-        document.getElementById('brainDumpInput').value = '';
-        state.xp += 15; // Reward for clearing head
-        if (state.xp >= 100) { state.level++; state.xp -= 100; }
-        save();
-        render();
+        } catch(e) { console.log("Audio blocked"); }
     }
 
-    function completeTask(id) {
-        state.tasks = state.tasks.filter(t => t.id !== id);
-        state.xp += 20;
-        if (state.xp >= 100) { state.level++; state.xp -= 100; }
-        save();
-        render();
-    }
+    let voiceRecognizer = null;
+    let recordingActive = false;
 
-    function render() {
-        document.getElementById('levelDisplay').innerText = state.level;
-        document.getElementById('xpDisplay').innerText = state.xp;
-        document.getElementById('xpBar').style.width = `${state.xp}%`;
+    function toggleVoiceCapture() {
+        const btn = document.getElementById('micButton');
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert("Speech recognition is not supported on this browser window yet. Try standard Safari or Chrome on mobile!");
+            return;
+        }
 
-        // Clear all folders
-        document.getElementById('urgentList').innerHTML = '';
-        document.getElementById('routineList').innerHTML = '';
-        document.getElementById('lowList').innerHTML = '';
+        if (!voiceRecognizer) {
+            const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+            voiceRecognizer = new SpeechClass();
+            voiceRecognizer.continuous = true;
+            voiceRecognizer.interimResults = false;
 
-        state.tasks.forEach(task => {
-            const card = document.createElement('div');
-            card.className = 'task-card';
-            card.innerHTML = `
-                <div>
-                    <span class="tag tag-${task.priority}">${task.priority.toUpperCase()}</span>
-                    <span style="margin-left: 8px;">${task.text}</span>
-                </div>
-                <button onclick="completeTask(${task.id})">⚔️</button>
-            `;
+            voiceRecognizer.onresult = function(event) {
+                let speechResultString = "";
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) speechResultString += event.results[i].transcript;
+                }
+                document.getElementById('capturedTextTextarea').value += speechResultString + " ";
+                playChimeEffect('pop');
+            };
 
-            // Automatically place task card in correct HTML folder container
-            if (task.priority === 'urgent') document.getElementById('urgentList').appendChild(card);
-            if (task.priority === 'routine') document.getElementById('routineList').appendChild(card);
-            if (task.priority === 'low') document.getElementById('lowList').appendChild(card);
-        });
-    }
-
-    render();
-</script>
-</body>
-</html>
+            voiceRecognizer.onend = function() {
+                recordingActive = false;
+                btn.className = "mic-btn";
+                btn.innerText = "🎵 Tap to Stream Voice Input";
+                processRawThoughtMatrix();
+            };
+        }
