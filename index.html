@@ -22,15 +22,11 @@
             background-image: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent), radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.03), transparent);
         }
         .container { width: 100%; max-width: 440px; }
-        
-        /* Dashboard & Time Gauge */
         .dashboard {
-            background: var(--card-bg); padding: 15px; border-radius: 16px;
+            background: var(--card-bg); padding: 15px; border-radius: 166px;
             margin-bottom: 15px; border: 1px solid #1f2d4d; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         .gauge-container { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.85rem; }
-        
-        /* Backpack Load Metaphor Visualizer */
         .backpack-zone {
             background: #111827; padding: 12px; border-radius: 12px;
             margin-bottom: 15px; display: flex; align-items: center; gap: 15px;
@@ -39,8 +35,6 @@
         .backpack-avatar { font-size: 2.2rem; filter: drop-shadow(0 0 8px var(--xp-color)); transition: transform 0.3s; }
         .weight-bar-bg { background: #1f293d; height: 12px; border-radius: 6px; width: 100%; overflow: hidden; margin-top: 4px; }
         .weight-bar { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); height: 100%; width: 0%; transition: width 0.5s ease; }
-
-        /* Voice/Text Core Control Area */
         .input-hub {
             background: #111c30; border: 2px dashed #3b82f6; padding: 15px; border-radius: 14px; margin-bottom: 20px;
         }
@@ -49,18 +43,13 @@
             border-radius: 8px; border: none; cursor: pointer; margin-top: 8px; display: flex; justify-content: center; align-items: center; gap: 8px;
         }
         .mic-active { background: #ef4444; animation: pulse 1.5s infinite; }
-
-        /* Smooth Timer Block */
         .timer-box {
             background: #182238; border: 1px solid #2d3d66; padding: 15px; border-radius: 12px;
             text-align: center; margin-bottom: 20px;
         }
         .timer-digits { font-size: 2.5rem; font-weight: bold; color: #34d399; font-variant-numeric: tabular-nums; }
-
-        /* Drag-Drop Lane Structures */
         .lane { background: rgba(19, 27, 46, 0.5); padding: 12px; border-radius: 12px; margin-bottom: 15px; min-height: 60px; border: 1px solid #1f293d; }
         .lane-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; }
-        
         .task-card {
             background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 8px;
             border-left: 4px solid var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -68,14 +57,9 @@
         }
         .task-main { display: flex; justify-content: space-between; align-items: center; }
         .task-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-dim); border-top: 1px solid #1f2d4d; padding-top: 6px; }
-        
-        .move-select {
-            background: #1f293d; color: #fff; border: 1px solid #3b82f6;
-            font-size: 0.75rem; padding: 2px; border-radius: 4px; outline: none;
-        }
+        .move-select { background: #1f293d; color: #fff; border: 1px solid #3b82f6; font-size: 0.75rem; padding: 2px; border-radius: 4px; outline: none; }
         .action-link { color: #f59e0b; cursor: pointer; text-decoration: underline; }
         .complete-btn { background: var(--accent); color: #000; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: none; }
-
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
     </style>
 </head>
@@ -107,7 +91,7 @@
         <h3 style="margin:0 0 4px 0; color:#3b82f6; font-size:1rem;">🎙️ Hands-Free Run-On Voice Smasher</h3>
         <p style="margin:0 0 10px 0; font-size:0.75rem; color:var(--text-dim);">Tap mic and speak continuously. The app will automatically slice your run-on sentences into isolated tasks and estimate time.</p>
         <textarea id="capturedTextTextarea" placeholder="Speak or type your raw thought loop here..."></textarea>
-        <button id="micButton" class="mic-btn" onclick="toggleVoiceCapture()">🎵 Tap to Stream Voice Input</button>
+        <button id="micButton" class="mic-btn" onclick="toggleVoiceCapture()">➔ Tap to Stream Voice Input</button>
     </div>
 
     <div class="timer-box">
@@ -133,6 +117,11 @@
 </div>
 
 <script>
+    // SECURE MOBILE REGISTER CORE
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').then(() => console.log("Secure Audio Framework Active"));
+    }
+
     let coreState = JSON.parse(localStorage.getItem('questflow_master_state')) || {
         backlog: [], xp: 0, level: 1
     };
@@ -150,22 +139,19 @@
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-
             if (type === 'success') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
                 osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
                 gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.3);
             } else if (type === 'pop') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(330, audioCtx.currentTime);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(330, audioCtx.currentTime);
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.1);
             }
-        } catch(e) { console.log("Audio blocked"); }
+        } catch(e) {}
     }
 
     let voiceRecognizer = null;
@@ -174,7 +160,7 @@
     function toggleVoiceCapture() {
         const btn = document.getElementById('micButton');
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            alert("Speech recognition is not supported on this browser window yet. Try standard Safari or Chrome on mobile!");
+            alert("Please test directly inside your Chrome or Safari browser tab rather than the Home Screen icon to allow microphone permission fields!");
             return;
         }
 
@@ -196,7 +182,10 @@
             voiceRecognizer.onend = function() {
                 recordingActive = false;
                 btn.className = "mic-btn";
-                btn.innerText = "🎵 Tap to Stream Voice Input";
+                btn.innerText = "➔ Tap to Stream Voice Input";
                 processRawThoughtMatrix();
             };
         }
+        if (!recordingActive) {
+            voiceRecognizer.start();
+            recordingActive = true;
