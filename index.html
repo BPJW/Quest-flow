@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuestFlow Pro - ADHD Hub</title>
+    <title>QuestFlow Pro</title>
     <style>
         :root {
             --bg-color: #0b111e;
@@ -82,46 +82,33 @@
 </div>
 <script>
     let state = { tasks: [], xp: 0, level: 1 };
-    
-    // SAFETY CHECK: Safely read database memory without causing rendering engine crashes
     try {
-        let saved = localStorage.getItem('questflow_v9_master');
+        let saved = localStorage.getItem('questflow_v10_clean');
         if (saved) { state = JSON.parse(saved); }
     } catch(e) {}
     
     let clockInterval = null, clockTimeRemaining = 25 * 60, clockRunning = false, activeTimerTaskId = null;
 
     function saveState() { 
-        try { localStorage.setItem('questflow_v9_master', JSON.stringify(state)); } catch(e) {}
+        try { localStorage.setItem('questflow_v10_clean', JSON.stringify(state)); } catch(e) {}
     }
 
     function smashBrainDump() {
         const text = document.getElementById('brainDumpInput').value;
         if (!text.trim()) return;
-
         const rawItems = text.split(/\n|,|\./);
         rawItems.forEach(item => {
             let taskText = item.trim();
             if (!taskText || taskText.length < 2) return;
-
             let priority = 'routine', duration = 20;
             const lower = taskText.toLowerCase();
-
             if (lower.includes('quick') || lower.includes('minute') || lower.includes('grab') || lower.includes('check') || lower.includes('fish')) duration = 15;
             if (lower.includes('clean') || lower.includes('cook') || lower.includes('shower') || lower.includes('wash') || lower.includes('laundry')) duration = 30;
             if (lower.includes('study') || lower.includes('project') || lower.includes('drive') || lower.includes('fix') || lower.includes('build') || lower.includes('engine')) duration = 60;
-
             if (lower.includes('asap') || lower.includes('now') || lower.includes('today') || lower.includes('deadline') || lower.includes('wash') || lower.includes('build')) priority = 'urgent';
             if (lower.includes('later') || lower.includes('someday') || lower.includes('whenever') || lower.includes('maybe') || lower.includes('fish')) priority = 'low';
-
-            state.tasks.push({
-                id: 't-' + Date.now() + Math.random().toString(36).substr(2, 4),
-                text: taskText.charAt(0).toUpperCase() + taskText.slice(1),
-                priority: priority,
-                duration: duration
-            });
+            state.tasks.push({ id: 't-' + Date.now() + Math.random().toString(36).substr(2, 4), text: taskText.charAt(0).toUpperCase() + taskText.slice(1), priority: priority, duration: duration });
         });
-
         document.getElementById('brainDumpInput').value = '';
         state.xp += 15;
         if (state.xp >= 100) { state.level++; state.xp -= 100; }
@@ -172,11 +159,12 @@
 
     function updateClockDisplay() {
         let m = Math.floor(clockTimeRemaining / 60), s = clockTimeRemaining % 60;
-document.getElementById('clockFace').innerText = ${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s};
-}
-function completeTask(id) {
-if (!state.tasks) return;
-state.tasks = state.tasks.filter(t =>  !== id);
+        document.getElementById('clockFace').innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+    }
+
+    function completeTask(id) {
+        if (!state.tasks) return;
+        state.tasks = state.tasks.filter(t => t.id !== id);
 state.xp += 25;
 if (state.xp >= 100) { state.level++; state.xp -= 100; }
 saveState();
@@ -205,7 +193,7 @@ if (state.tasks && state.tasks.length > 0) {
 state.tasks.forEach(task => {
 const card = document.createElement('div');
 card.className = 'task-card';
-card.innerHTML =  <div class="task-main"><span>${task.text}</span><button class="complete-btn" onclick="completeTask('${}')">Slay ⚔️</button></div> <div class="task-footer"><span>⏱️ ${task.duration}m</span><div> <span class="action-link" onclick="launchTimer('${task.id}','${task.text}',${task.duration})">⚡ Focus</span> <span class="action-link" style="color:#f43f5e;margin-left:10px;" onclick="delegateTask('${task.id}')">🤝 Delegate</span> <span class="action-link" style="color:#3b82f6;margin-left:10px;" onclick="moveTaskLane('${task.id}')">🔄 Shift</span> </div></div>;
+card.innerHTML =  <div class="task-main"><span>${task.text}</span><button class="complete-btn" onclick="completeTask('${task.id}')">Slay ⚔️</button></div> <div class="task-footer"><span>⏱️ ${task.duration}m</span><div> <span class="action-link" onclick="launchTimer('${task.id}','${task.text}',${task.duration})">⚡ Focus</span> <span class="action-link" style="color:#f43f5e;margin-left:10px;" onclick="delegateTask('${task.id}')">🤝 Delegate</span> <span class="action-link" style="color:#3b82f6;margin-left:10px;" onclick="moveTaskLane('${task.id}')">🔄 Shift</span> </div></div>;
 let targetLane = document.getElementById(${task.priority}List);
 if (targetLane) targetLane.appendChild(card);
 });
