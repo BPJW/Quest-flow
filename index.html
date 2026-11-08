@@ -29,7 +29,7 @@
         .stat-row { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; }
         .xp-bar-container { background: #1f293d; height: 10px; border-radius: 5px; overflow: hidden; }
         .xp-bar { background: var(--xp-color); height: 100%; width: 0%; transition: width 0.4s ease; }
-        .daylight-str { font-size: 0.85rem; color: var(--text-dim); margin-top: 8px; text-align: center; }
+        .daylight-str { font-size: 0.95rem; font-weight: bold; color: #fff; margin-top: 8px; text-align: center; background: rgba(59,130,246,0.15); padding: 6px; border-radius: 6px; }
 
         .backpack-zone {
             background: #111c30; padding: 12px; border-radius: 10px;
@@ -103,8 +103,8 @@
     <!-- Main Working Input Zone -->
     <div class="dump-zone">
         <h3 style="margin: 0 0 5px 0; color: var(--xp-color); font-size: 1.05rem;">🧠 Chaos Brain Dump</h3>
-        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type your thoughts completely raw. Use commas, periods, or "and then" to separate tasks.</p>
-        <textarea id="brainDumpInput" placeholder="Example: wash laundry today, fix car tire asap, call doctor later..."></textarea>
+        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-dim);">Type your thoughts completely raw. Use commas, periods, or "and" to separate tasks.</p>
+        <textarea id="brainDumpInput" placeholder="Example: clean room today and fix car tire asap and call doctor later..."></textarea>
         <button class="btn-purple" onclick="smashBrainDump()">Sort & Organize Automatically ✨</button>
     </div>
 
@@ -133,7 +133,7 @@
 </div>
 
 <script>
-    let state = JSON.parse(localStorage.getItem('questflow_v3_state')) || { tasks: [], xp: 0, level: 1 };
+    let state = JSON.parse(localStorage.getItem('questflow_v4_state')) || { tasks: [], xp: 0, level: 1 };
     
     let clockInterval = null;
     let clockTimeRemaining = 25 * 60;
@@ -141,14 +141,15 @@
     let activeTimerTaskId = null;
 
     function saveState() { 
-        localStorage.setItem('questflow_v3_state', JSON.stringify(state)); 
+        localStorage.setItem('questflow_v4_state', JSON.stringify(state)); 
     }
 
     function smashBrainDump() {
         const text = document.getElementById('brainDumpInput').value;
         if (!text.trim()) return;
 
-        const rawItems = text.split(/,|\.|\band then\b|\bthen\b|\balso\b/i);
+        // Split text cleanly by punctuation breathing marks or explicit logic connectors
+        const rawItems = text.split(/,|\.|\band\b|\bthen\b/i);
         
         rawItems.forEach(item => {
             let taskText = item.trim();
@@ -159,12 +160,13 @@
 
             const lower = taskText.toLowerCase();
 
-            if (lower.includes('quick') || lower.includes('minute') || lower.includes('grab') || lower.includes('check')) duration = 5;
+            // Automatic Smart Priority Guessing Metrics
+            if (lower.includes('quick') || lower.includes('minute') || lower.includes('grab') || lower.includes('check') || lower.includes('buy')) duration = 10;
             if (lower.includes('clean') || lower.includes('cook') || lower.includes('shower') || lower.includes('wash')) duration = 30;
             if (lower.includes('study') || lower.includes('project') || lower.includes('drive') || lower.includes('fix')) duration = 60;
 
-            if (lower.includes('asap') || lower.includes('urgent') || lower.includes('now') || lower.includes('today')) priority = 'urgent';
-            if (lower.includes('later') || lower.includes('someday') || lower.includes('whenever')) priority = 'low';
+            if (lower.includes('asap') || lower.includes('urgent') || lower.includes('now') || lower.includes('today') || lower.includes('deadline') || lower.includes('fix') || lower.includes('clean')) priority = 'urgent';
+            if (lower.includes('later') || lower.includes('someday') || lower.includes('whenever') || lower.includes('maybe')) priority = 'low';
 
             state.tasks.push({
                 id: 't-' + Date.now() + Math.random().toString(36).substr(2, 4),
@@ -210,12 +212,3 @@
     function toggleClockEngine() {
         if (clockRunning) {
             clearInterval(clockInterval);
-            clockRunning = false;
-        } else {
-            clockRunning = true;
-            clockInterval = setInterval(() => {
-                clockTimeRemaining--;
-                updateClockDisplay();
-                if (clockTimeRemaining <= 0) {
-                    clearInterval(clockInterval);
-                    clockRunning = false;
