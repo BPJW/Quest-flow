@@ -3,331 +3,403 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Pack App</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f4f8;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            max-width: 900px;
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 20px;
-        }
-        @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; }
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-        h2 { margin-top: 0; color: #334e68; }
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        input[type="text"], select {
-            padding: 10px;
-            border: 1px solid #bcccdc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        input[type="text"] { flex: 1; }
-        button {
-            padding: 10px 15px;
-            background-color: #6200ee;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        button:hover { background-color: #4b00b4; }
-        .stats {
-            font-size: 18px;
-            font-weight: bold;
-            color: #102a43;
-            margin-bottom: 15px;
-            background: #e0f2fe;
-            padding: 10px;
-            border-radius: 6px;
-            display: inline-block;
-        }
-        .columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-        }
-        @media (max-width: 600px) {
-            .columns { grid-template-columns: 1fr; }
-        }
-        .column {
-            background: #f7fafc;
-            padding: 10px;
-            border-radius: 8px;
-            border-top: 4px solid #cbd5e0;
-            min-height: 200px;
-        }
-        .column.urgent { border-top-color: #ef4444; background: #fef2f2; }
-        .column.steady { border-top-color: #3b82f6; background: #eff6ff; }
-        .column.later { border-top-color: #10b981; background: #ecfdf5; }
-        .column h3 { margin: 5px 0 10px 0; text-align: center; font-size: 16px; }
-        .task-item {
-            background: white;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #e2e8f0;
-        }
-        .task-text { font-size: 14px; word-break: break-word; }
-        .done-btn {
-            background-color: #10b981;
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-        .done-btn:hover { background-color: #059669; }
-        .character-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: sticky;
-            top: 20px;
-        }
-        canvas {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .warning-text {
-            color: #ef4444;
-            font-weight: bold;
-            margin-top: 10px;
-            text-align: center;
-            height: 20px;
-        }
-    </style>
+    <title>BrainSpark - ADHD Task Magic</title>
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Canvas Confetti Library for Rewards -->
+    <script src="https://jsdelivr.net"></script>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Left Side: Tasks & Management -->
-        <div>
-            <div class="card">
-                <h2>🎒 Task Pack Dashboard</h2>
-                <div class="stats">🌟 Star Points: <span id="reward-points">0</span></div>
-                
-                <div class="input-group">
-                    <input type="text" id="task-input" placeholder="Type a random task...">
-                    <select id="priority-input">
-                        <option value="urgent">🚨 Urgent</option>
-                        <option value="steady" selected>📈 Steady</option>
-                        <option value="later">⏳ Later</option>
-                    </select>
-                    <button onclick="addTask()">Add Task</button>
-                </div>
-            </div>
+    <header>
+        <h1>⚡ BrainSpark ⚡</h1>
+        <p>Clear your head, gamify your day!</p>
+        <div class="xp-bar-container">
+            <div class="xp-bar" id="xpBar"></div>
+        </div>
+        <div class="stats">LEVEL: <span id="levelDisplay">1</span> | XP: <span id="xpDisplay">0</span>/100</div>
+    </header>
 
-            <div class="columns">
-                <div class="column urgent">
-                    <h3>Urgent</h3>
-                    <div id="urgent-tasks"></div>
-                </div>
-                <div class="column steady">
-                    <h3>Steady</h3>
-                    <div id="steady-tasks"></div>
-                </div>
-                <div class="column later">
-                    <h3>Later</h3>
-                    <div id="later-tasks"></div>
-                </div>
+    <div class="input-area">
+        <input type="text" id="taskInput" placeholder="Got a thought? Dump it here real quick...">
+        <button class="btn-add" onclick="addTask()">DUMP! 🧠</button>
+    </div>
+
+    <div class="board">
+        <!-- BRAIN DUMP -->
+        <div class="column col-dump" data-status="dump">
+            <div class="column-header">
+                <h2>☁️ Brain Dump Zone</h2>
+                <select class="sort-select" onchange="sortColumn('dump', this.value)">
+                    <option value="newest">Newest</option>
+                    <option value="alpha">A-Z</option>
+                </select>
             </div>
+            <div class="task-list" id="dumpList" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
         </div>
 
-        <!-- Right Side: Dynamic Character Visual -->
-        <div class="character-box">
-            <canvas id="charCanvas" width="280" height="380"></canvas>
-            <div id="warning" class="warning-text"></div>
+        <!-- DOING -->
+        <div class="column col-todo" data-status="todo">
+            <div class="column-header">
+                <h2>🎯 Active Focus</h2>
+                <select class="sort-select" onchange="sortColumn('todo', this.value)">
+                    <option value="newest">Newest</option>
+                    <option value="alpha">A-Z</option>
+                </select>
+            </div>
+            <div class="task-list" id="todoList" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
+        </div>
+
+        <!-- DONE -->
+        <div class="column col-done" data-status="done">
+            <div class="column-header">
+                <h2>🎉 Crushed It!</h2>
+                <select class="sort-select" onchange="sortColumn('done', this.value)">
+                    <option value="newest">Newest</option>
+                    <option value="alpha">A-Z</option>
+                </select>
+            </div>
+            <div class="task-list" id="doneList" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
         </div>
     </div>
 
-    <script>
-        let tasks = [];
-        let points = 0;
-
-        const canvas = document.getElementById('charCanvas');
-        const ctx = canvas.getContext('2d');
-
-        function addTask() {
-            const input = document.getElementById('task-input');
-            const priority = document.getElementById('priority-input').value;
-            
-            if (input.value.trim() === '') return;
-
-            const newTask = {
-                id: Date.now(),
-                text: input.value,
-                priority: priority
-            };
-
-            tasks.push(newTask);
-            input.value = '';
-            
-            updateUI();
-        }
-
-        function completeTask(id, priority) {
-            tasks = tasks.filter(task => task.id !== id);
-            
-            // Reward system allocation
-            if (priority === 'urgent') points += 30;
-            else if (priority === 'steady') points += 20;
-            else points += 10;
-
-            updateUI();
-        }
-
-        function updateUI() {
-            // Clear current task items from columns
-            document.getElementById('urgent-tasks').innerHTML = '';
-            document.getElementById('steady-tasks').innerHTML = '';
-            document.getElementById('later-tasks').innerHTML = '';
-            
-            document.getElementById('reward-points').innerText = points;
-
-            // Sort and append tasks
-            tasks.forEach(task => {
-                const taskEl = document.createElement('div');
-                taskEl.className = 'task-item';
-                taskEl.innerHTML = `
-                    <span class="task-text">${task.text}</span>
-                    <button class="done-btn" onclick="completeTask(${task.id}, '${task.priority}')">✓</button>
-                `;
-                document.getElementById(`${task.priority}-tasks`).appendChild(taskEl);
-            });
-
-            // Warn user if backpack is getting too heavy
-            const warningEl = document.getElementById('warning');
-            if (tasks.length >= 7) {
-                warningEl.innerText = "⚠️ Backpack is getting heavy!";
-            } else {
-                warningEl.innerText = "";
-            }
-
-            drawCharacter();
-        }
-
-        function drawCharacter() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const taskCount = tasks.length;
-            // Backpack grows dynamically based on number of active tasks
-            const packWidth = 40 + (taskCount * 12);
-            const packHeight = 60 + (taskCount * 15);
-            
-            // Center parameters for coordinates
-            const cx = 160;
-            const cy = 200;
-
-            // 1. Draw Expanding Backpack (Behind the person)
-            ctx.fillStyle = '#4f46e5'; // Purple backpack
-            ctx.strokeStyle = '#3730a3';
-            ctx.lineWidth = 3;
-            
-            // Backpack shape (offset slightly to the left side of the back)
-            const rx = cx - packWidth + 10;
-            const ry = cy - 40;
-            
-            ctx.beginPath();
-            ctx.roundRect(rx, ry, packWidth, packHeight, 10);
-            ctx.fill();
-            ctx.stroke();
-
-            // Backpack pocket lines if there are items inside
-            if (taskCount > 0) {
-                ctx.fillStyle = '#818cf8';
-                ctx.beginPath();
-                ctx.roundRect(rx + 5, ry + packHeight - (packHeight/2), packWidth - 10, (packHeight/2) - 5, 5);
-                ctx.fill();
-            }
-
-            // 2. Draw Legs
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = 6;
-            ctx.beginPath();
-            // Left leg
-            ctx.moveTo(cx - 15, cy + 60);
-            ctx.lineTo(cx - 15, cy + 130);
-            // Right leg
-            ctx.moveTo(cx + 15, cy + 60);
-            ctx.lineTo(cx + 15, cy + 130);
-            ctx.stroke();
-
-            // Shoes
-            ctx.fillStyle = '#475569';
-            ctx.beginPath();
-            ctx.arc(cx - 15, cy + 130, 8, 0, Math.PI, true);
-            ctx.arc(cx + 15, cy + 130, 8, 0, Math.PI, true);
-            ctx.fill();
-
-            // 3. Draw Body (Torso)
-            ctx.fillStyle = '#f59e0b'; // Amber shirt
-            ctx.beginPath();
-            ctx.roundRect(cx - 25, cy - 30, 50, 90, 8);
-            ctx.fill();
-
-            // 4. Draw Head & Face
-            ctx.fillStyle = '#ffdbac'; // Skin tone
-            ctx.beginPath();
-            ctx.arc(cx, cy - 65, 25, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Happy Eyes
-            ctx.fillStyle = '#1e293b';
-ctx.beginPath();
-ctx.arc(cx - 8, cy - 68, 2.5, 0, Math.PI * 2);
-ctx.arc(cx + 8, cy - 68, 2.5, 0, Math.PI * 2);
-ctx.fill();
-// Smile (Strained smile if carrying too many tasks)
-ctx.beginPath();
-if (taskCount >= 6) {
-// Flat line representing stress
-ctx.moveTo(cx - 8, cy - 55);
-ctx.lineTo(cx + 8, cy - 55);
-ctx.stroke();
-} else {
-// Happy smile curve
-ctx.arc(cx, cy - 58, 6, 0, Math.PI);
-ctx.stroke();
+    <!-- JavaScript App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
+:root {
+    --bg-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    --panel-dump: #ffeb3b;
+    --panel-todo: #4caf50;
+    --panel-done: #2196f3;
+    --text-dark: #2c3e50;
 }
-// 5. Draw Arms
-ctx.strokeStyle = '#f59e0b';
-ctx.lineWidth = 6;
-ctx.beginPath();
-// Left arm holding onto backpack straps
-ctx.moveTo(cx - 25, cy - 20);
-ctx.lineTo(cx - 35, cy + 10);
-ctx.lineTo(cx - 20, cy + 20);
-// Right arm waving free
-ctx.moveTo(cx + 25, cy - 20);
-ctx.lineTo(cx + 45, cy);
-ctx.lineTo(cx + 55, cy - 20);
-ctx.stroke();
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    color: var(--text-dark);
 }
-// Initialize empty state character
-drawCharacter();
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+h1 { 
+    margin: 0; 
+    font-size: 2.5rem; 
+    color: #ff4757; 
+    text-shadow: 2px 2px #fff; 
+}
+
+.xp-bar-container {
+    background: #dfe6e9;
+    border-radius: 15px;
+    height: 25px;
+    width: 60%;
+    margin: 15px auto 5px;
+    overflow: hidden;
+    border: 3px solid #2c3e50;
+}
+
+.xp-bar {
+    background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease;
+}
+
+.stats { 
+    font-weight: bold; 
+    font-size: 1.1rem; 
+}
+
+.input-area {
+    max-width: 600px;
+    margin: 0 auto 30px;
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 15px;
+    border: 3px solid #2c3e50;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    outline: none;
+}
+
+button.btn-add {
+    background: #ff4757;
+    color: white;
+    border: 3px solid #2c3e50;
+    border-radius: 50px;
+    padding: 0 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+button.btn-add:active { 
+    transform: scale(0.95); 
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.column {
+    background: rgba(255, 255, 255, 0.9);
+    border: 4px solid #2c3e50;
+    border-radius: 25px;
+    padding: 20px;
+    box-shadow: 5px 5px 0px #2c3e50;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 3px dashed #2c3e50;
+    padding-bottom: 10px;
+}
+
+.column h2 { 
+    margin: 0; 
+    font-size: 1.5rem; 
+}
+
+.col-dump { border-color: #f1c40f; }
+.col-todo { border-color: #2ecc71; }
+.col-done { border-color: #3498db; }
+
+.task-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 20px;
+}
+
+.task {
+    background: #fff;
+    border: 3px solid #2c3e50;
+    border-radius: 15px;
+    padding: 15px;
+    cursor: grab;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 3px 3px 0px #2c3e50;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.task:active { 
+    cursor: grabbing; 
+    transform: scale(0.98); 
+}
+
+.task.dragging { 
+    opacity: 0.5; 
+}
+
+.task-buttons button {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.sort-select {
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: 2px solid #2c3e50;
+    font-weight: bold;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+let xp = 0;
+let level = 1;
+let tasks = [];
+
+// Simple Audio Engine (Synthesizes sound directly in browser)
+function playSound(type) {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === 'complete') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(150, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.start(); 
+        osc.stop(ctx.currentTime + 0.3);
+    } else if (type === 'levelup') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.setValueAtTime(450, ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(600, ctx.currentTime + 0.2);
+        osc.frequency.setValueAtTime(900, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.start(); 
+        osc.stop(ctx.currentTime + 0.5);
+    }
+}
+
+function addTask() {
+    const input = document.getElementById('taskInput');
+    if (!input.value.trim()) return;
+
+    const newTask = {
+        id: Date.now().toString(),
+        text: input.value,
+        status: 'dump', // Always defaults to Brain Dump Zone
+        timestamp: new Date()
+    };
+
+    tasks.push(newTask);
+    input.value = '';
+    renderTasks();
+}
+
+function renderTasks() {
+    const lists = {
+        dump: document.getElementById('dumpList'),
+        todo: document.getElementById('todoList'),
+        done: document.getElementById('doneList')
+    };
+
+    // Clear lists before rebuilding
+    Object.values(lists).forEach(list => list.innerHTML = '');
+
+    tasks.forEach(task => {
+        const taskEl = document.createElement('div');
+        taskEl.classList.add('task');
+        taskEl.setAttribute('draggable', 'true');
+        taskEl.setAttribute('id', task.id);
+        taskEl.addEventListener('dragstart', dragStart);
+        taskEl.addEventListener('dragend', dragEnd);
+
+        taskEl.innerHTML = `
+            <span>${task.text}</span>
+            <div class="task-buttons">
+                ${task.status !== 'done' ? `<button onclick="changeStatus('${task.id}', 'done')">✅</button>` : ''}
+                <button onclick="deleteTask('${task.id}')">❌</button>
+            </div>
+        `;
+
+        lists[task.status].appendChild(taskEl);
+    });
+}
+
+// Drag and Drop Controllers
+function dragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.id);
+    setTimeout(() => e.target.classList.add('dragging'), 0);
+}
+
+// Drag End Hook
+function dragEnd(e) {
+    e.target.classList.remove('dragging');
+}
+
+function allowDrop(e) {
+    e.preventDefault();
+}
+
+function drop(e) {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain');
+    const targetColumn = e.target.closest('.column');
+    if (targetColumn) {
+        const newStatus = targetColumn.getAttribute('data-status');
+        changeStatus(id, newStatus);
+    }
+}
+
+function changeStatus(id, newStatus) {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+        const oldStatus = task.status;
+        task.status = newStatus;
+        
+        // Triggers rewards only on a forward move to Done column
+        if (newStatus === 'done' && oldStatus !== 'done') {
+            gainXP(25);
+            playSound('complete');
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+        
+        renderTasks();
+    }
+}
+
+function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    renderTasks();
+}
+
+// Experience Engine
+function gainXP(amount) {
+    xp += amount;
+    if (xp >= 100) {
+        xp -= 100;
+        level++;
+        playSound('levelup');
+        confetti({ particleCount: 200, spread: 100, colors: ['#ff0000', '#00ff00', '#0000ff'] });
+    }
+    updateXPBar();
+}
+
+function updateXPBar() {
+    document.getElementById('xpBar').style.width = `${xp}%`;
+    document.getElementById('xpDisplay').innerText = xp;
+    document.getElementById('levelDisplay').innerText = level;
+}
+
+// Sorting Functions
+function sortColumn(status, criteria) {
+    const columnTasks = tasks.filter(t => t.status === status);
+    
+    if (criteria === 'alpha') {
+        columnTasks.sort((a, b) => a.text.localeCompare(b.text));
+    } else if (criteria === 'newest') {
+        columnTasks.sort((a, b) => b.id - a.id);
+    }
+
+    tasks = tasks.filter(t => t.status !== status).concat(columnTasks);
+    renderTasks();
+}
+
+// Global Enter Key Listener for accessibility
+document.getElementById('taskInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addTask();
+});
